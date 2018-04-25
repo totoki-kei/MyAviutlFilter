@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="AudioMultiplier.h">
+      <Filter>AudioMultiplier</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioPosition.h">
+      <Filter>AudioPosition</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BosekiAudioFilter.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="AudioMultiplier.cpp">
+      <Filter>AudioMultiplier</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioPosition.cpp">
+      <Filter>AudioPosition</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BosekiAudioFilter.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="AudioMultiplier">
+      <UniqueIdentifier>{052197f4-b0f7-4436-9b5d-67d9e982af82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AudioPosition">
+      <UniqueIdentifier>{b1d5c5ad-32b2-4f33-957c-7195f3e5473b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

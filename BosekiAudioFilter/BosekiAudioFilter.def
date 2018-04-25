@@ -1,0 +1,4 @@
+LIBRARY BosekiSoundFilter.auf
+
+EXPORTS
+	GetFilterTable @1
