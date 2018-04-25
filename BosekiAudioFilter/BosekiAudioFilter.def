@@ -1,4 +1,4 @@
-LIBRARY BosekiSoundFilter.auf
+LIBRARY BosekiAudioFilter.auf
 
 EXPORTS
-	GetFilterTable @1
+	GetFilterTableList @1

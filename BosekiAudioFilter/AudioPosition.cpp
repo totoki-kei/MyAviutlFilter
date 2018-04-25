@@ -1,34 +1,29 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "AudioPosition.h"
 
 namespace AudioPosition {
 
-	int     track_count = 2;
-	LPCTSTR track_names[] = { _T("ƒŒƒxƒ‹"), _T("¶‰E") };
-	int     track_default_values[] = { 256, 0 };
-	int     track_min_values[] = { 0, -100 };
-	int     track_max_values[] = { 256, 100 };
+	int     track_count = 1;
+	LPCTSTR track_names[] = { _T("å·¦å³") };
+	int     track_default_values[] = { 0 };
+	int     track_min_values[] = { -10000 };
+	int     track_max_values[] = {  10000 };
 
 
 	BOOL FilterProc(FILTER *fp, FILTER_PROC_INFO *fpip) {
 
-		// ‰¹—Ê‚ğ•ÏX‚·‚é
-		for (int i = 0; i < fpip->audio_n * fpip->audio_ch; i++) {
-			fpip->audiop[i] = (short)(fpip->audiop[i] * fp->track[0] / 256);
-		}
-
-		// ¶‰EŠ„‡‚ğ•ÏX‚·‚é
+		// å·¦å³å‰²åˆã‚’å¤‰æ›´ã™ã‚‹
 		for (int i = 0; i < fpip->audio_n; i++) {
-			// ‰¼‚ÉAƒ`ƒƒƒ“ƒlƒ‹0‚ğ¶Aƒ`ƒƒƒ“ƒlƒ‹1‚ğ‰E‚Æ‚µ‚Äˆ—‚ğ‹Lq‚·‚é
+			// ä»®ã«ã€ãƒãƒ£ãƒ³ãƒãƒ«0ã‚’å·¦ã€ãƒãƒ£ãƒ³ãƒãƒ«1ã‚’å³ã¨ã—ã¦å‡¦ç†ã‚’è¨˜è¿°ã™ã‚‹
 			auto left = fpip->audiop[2 * i];
 			auto right = fpip->audiop[2 * i + 1];
 
-			auto value = fp->track[1];
+			auto balance = fp->track[0] / 10000.0;
 
-			double ll = value < 0 ? 1.0 : (100 - value) / 100.0;
-			double lr = value < 0 ? (-value) / 100.0 : 0.0;
-			double rl = value < 0 ? 0.0 : (value) / 100.0;
-			double rr = value < 0 ? (100 + value) / 100.0 : 1.0;
+			double ll = balance < 0 ? 1.0           : 1.0 - balance;
+			double lr = balance < 0 ? 0.0 - balance : 0.0          ;
+			double rl = balance < 0 ? 0.0           : 0.0 + balance;
+			double rr = balance < 0 ? 1.0 + balance : 1.0          ;
 
 			fpip->audiop[2 * i] = static_cast<short>(left * ll + right * lr);
 			fpip->audiop[2 * i + 1] = static_cast<short>(left * rl + right * rr);
@@ -45,11 +40,11 @@ namespace AudioPosition {
 		// x, y
 		0,0,
 		// name
-		_T("‰¹ºƒtƒBƒ‹ƒ^A"),
+		_T("BosekiéŸ³å£°ãƒ•ã‚£ãƒ«ã‚¿(å·¦å³)"),
 		// track_n, track_name[], track_default[], track_start[], track_end[]
 		track_count,track_names,track_default_values,track_min_values,track_max_values,
 		// check_n, check_name[], check_default[]
-		NULL,NULL,NULL,
+		0,NULL,NULL,
 		// func_proc
 		FilterProc,
 		// func_init
@@ -67,13 +62,13 @@ namespace AudioPosition {
 		// ex_data_size
 		NULL,
 		// information
-		_T("‰¹ºƒtƒBƒ‹ƒ^ version 0.01 by Totoki Kei"),
+		_T("BosekiéŸ³å£°ãƒ•ã‚£ãƒ«ã‚¿(å·¦å³) version 1.0 by Totoki Kei"),
 		// func_save_start
 		NULL,
 		// func_save_end
 		NULL,
 
-		// ‚±‚±‚©‚çæ‚Ìƒƒ“ƒo‚Í0‰Šú’l
+		// ã“ã“ã‹ã‚‰å…ˆã®ãƒ¡ãƒ³ãƒã¯0åˆæœŸå€¤
 	};
 
 }

@@ -1,4 +1,4 @@
 LIBRARY MyAudioFilter.auf
 
 EXPORTS
-	GetFilterTableList @1
+	GetFilterTable @1

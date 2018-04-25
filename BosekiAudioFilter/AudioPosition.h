@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <AviUtl/filter.h>
 
 namespace AudioPosition {
