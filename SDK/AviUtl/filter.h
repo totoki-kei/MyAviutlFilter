@@ -135,492 +135,492 @@ typedef void*	AVI_FILE_HANDLE;
 
 //	外部関数構造体
 typedef struct {
-	void		(*get_ycp_ofs)( void *editp,int n,int ofs );
-								//	※出来るだけget_ycp_source_cache()の方を使用するようにしてください
-								//	指定したフレームのAVIファイル上でのオフセット分移動した
-								//	フレームの画像データのポインタを取得します
-								//	データはフィルタ前のものです
-								//	editp 	: エディットハンドル
-								//	n	 	: フレーム番号
-								//	ofs	 	: フレームからのオフセット
-								//  戻り値	: 画像データへのポインタ (NULLなら失敗)
-								//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
-	void		*(*get_ycp)( void *editp,int n );
-								//	※出来るだけget_ycp_source_cache()の方を使用するようにしてください
-								//	指定したフレームの画像データのポインタを取得します
-								//	データはフィルタ前のものです
-								//	editp 	: エディットハンドル
-								//	n	 	: フレーム番号
-								//  戻り値	: 画像データへのポインタ (NULLなら失敗)
-								//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
-	void		*(*get_pixelp)( void *editp,int n );
-								//	指定したフレームのDIB形式(RGB24bit)の画像データのポインタを取得します
-								//	データはフィルタ前のものです
-								//	editp 	: エディットハンドル
-								//	n		: フレーム番号
-								//  戻り値	: DIB形式データへのポインタ (NULLなら失敗)
-								//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
-	int			(*get_audio)( void *editp,int n,void *buf );
-								//	指定したフレームのオーディオデータを読み込みます
-								//	データはフィルタ前のものです
-								//	editp 	: エディットハンドル
-								//	n		: フレーム番号
-								//	buf 	: 格納するバッファ (NULLならサンプル数の取得のみ)
-								//  戻り値	: 読み込んだサンプル数
-	BOOL		(*is_editing)( void *editp );
-								//	現在編集中か調べます
-								//	editp 	: エディットハンドル
-								//  戻り値	: TRUEなら編集中
-	BOOL		(*is_saving)( void *editp );
-								//	現在保存中か調べます
-								//	editp 	: エディットハンドル
-								//  戻り値	: TRUEなら保存中
-	int			(*get_frame)( void *editp );
-								//	現在の表示フレームを取得します
-								//	editp 	: エディットハンドル
-								//  戻り値	: 現在のフレーム番号
-	int			(*get_frame_n)( void *editp );
-								//	総フレーム数を取得します
-								//	editp 	: エディットハンドル
-								//  戻り値	: 現在の総フレーム数
-	BOOL		(*get_frame_size)( void *editp,int *w,int *h );
-								//	フィルタ前のフレームのサイズを取得します
-								//	editp 	: エディットハンドル
-								//	w,h 	: 画像サイズの格納ポインタ
-								//  戻り値	: TRUEなら成功
-	int			(*set_frame)( void *editp,int n );
-								//	現在の表示フレームを変更します
-								//	editp 	: エディットハンドル
-								//  n		: フレーム番号
-								//  戻り値	: 設定されたフレーム番号
-	int			(*set_frame_n)( void *editp,int n );
-								//	総フレーム数を変更します
-								//	editp 	: エディットハンドル
-								//  n		: フレーム数
-								//  戻り値	: 設定された総フレーム数
-	BOOL		(*copy_frame)( void *editp,int d,int s );
-								//	フレームを他のフレームにコピーします
-								//	editp 	: エディットハンドル
-								//	d	 	: コピー先フレーム番号
-								//	s	 	: コピー元フレーム番号
-								//  戻り値	: TRUEなら成功
-	BOOL		(*copy_video)( void *editp,int d,int s );
-								//	フレームの映像だけを他のフレームにコピーします
-								//	editp 	: エディットハンドル
-								//	d	 	: コピー先フレーム番号
-								//	s	 	: コピー元フレーム番号
-								//  戻り値	: TRUEなら成功
-	BOOL		(*copy_audio)( void *editp,int d,int s );
-								//	フレームの音声だけを他のフレームにコピーします
-								//	editp 	: エディットハンドル
-								//	d	 	: コピー先フレーム番号
-								//	s	 	: コピー元フレーム番号
-								//  戻り値	: TRUEなら成功
-	BOOL		(*copy_clip)( HWND hwnd,void *pixelp,int w,int h );
-								//	クリップボードにDIB形式(RGB24bit)の画像をコピーします
-								//	hwnd 	: ウィンドウハンドル
-								//	pixelp	: DIB形式データへのポインタ
-								//	w,h 	: 画像サイズ
-								//  戻り値	: TRUEなら成功
-	BOOL		(*paste_clip)( HWND hwnd,void *editp,int n );
-								//	クリップボードから画像を張りつけます
-								//	hwnd 	: ウィンドウハンドル
-								//	editp 	: エディットハンドル
-								//  n		: フレーム番号
-								//  戻り値	: TRUEなら成功
-	BOOL		(*get_frame_status)( void *editp,int n,FRAME_STATUS *fsp );
-								//	フレームのステータスを取得します
-								//	editp 	: エディットハンドル
-								//  n		: フレーム番号
-								//  fps		: フレームステータスへのポインタ
-								//  戻り値	: TRUEなら成功
-	BOOL		(*set_frame_status)( void *editp,int n,FRAME_STATUS *fsp );
-								//	フレームのステータスを変更します
-								//	editp 	: エディットハンドル
-								//  n		: フレーム番号
-								//  fps		: フレームステータスへのポインタ
-								//  戻り値	: TRUEなら成功
-	BOOL		(*is_saveframe)( void *editp,int n );
-								//	実際に保存されるフレームか調べます
-								//	editp 	: エディットハンドル
-								//  n		: フレーム番号
-								//  戻り値	: TRUEなら保存されます
-	BOOL		(*is_keyframe)( void *editp,int n );
-								//	キーフレームかどうか調べます
-								//	editp 	: エディットハンドル
-								//  n		: フレーム番号
-								//  戻り値	: TRUEならキーフレーム
-	BOOL		(*is_recompress)( void *editp,int n );
-								//	再圧縮が必要か調べます
-								//	editp 	: エディットハンドル
-								//  n		: フレーム番号
-								//  戻り値	: TRUEなら再圧縮が必要
-	BOOL		(*filter_window_update)( void *fp );
-								//	設定ウィンドウのトラックバーとチェックボックスを再描画します
-								//	fp	 	: フィルタ構造体のポインタ
-								//  戻り値	: TRUEなら成功
-	BOOL		(*is_filter_window_disp)( void *fp );
-								//	設定ウィンドウが表示されているか調べます
-								//	fp	 	: フィルタ構造体のポインタ
-								//  戻り値	: TRUEなら表示されている
-	BOOL		(*get_file_info)( void *editp,FILE_INFO *fip );
-								//	編集ファイルの情報を取得します
-								//	editp 	: エディットハンドル
-								//  fip		: ファイルインフォメーション構造体へのポインタ
-								//  戻り値	: TRUEなら成功
-	LPSTR		(*get_config_name)( void *editp,int n );
-								//	現在のプロファイルの名前を取得します
-								//	editp 	: エディットハンドル
-								//  n		: プロファイル環境の番号
-								//  戻り値	: プロファイルの名前へのポインタ (NULLなら失敗)
-	BOOL		(*is_filter_active)( void *fp );
-								//	フィルタが有効になっているか調べます
-								//	fp	 	: フィルタ構造体のポインタ
-								//  戻り値	: TRUEならフィルタ有効
-	BOOL		(*get_pixel_filtered)( void *editp,int n,void *pixelp,int *w,int *h );
-								//	指定したフレームのDIB形式(RGB24bit)の画像データを読み込みます
-								//	データはフィルタ後のものです
-								//	editp 	: エディットハンドル
-								//	n		: フレーム番号
-								//  pixelp	: DIB形式データを格納するポインタ (NULLなら画像サイズだけを返します)
-								//	w,h		: 画像のサイズ (NULLならDIB形式データだけを返します)
-								//  戻り値	: TRUEなら成功
-	int			(*get_audio_filtered)( void *editp,int n,void *buf );
-								//	指定したフレームのオーディオデータを読み込みます
-								//	データはフィルタ後のものです
-								//	editp* 	: エディットハンドル
-								//	n		: フレーム番号
-								//	buf 	: 格納するバッファ (NULLならサンプル数の取得のみ)
-								//  戻り値	: 読み込んだサンプル数
-	BOOL		(*get_select_frame)( void *editp,int *s,int *e );
-								//	選択開始終了フレームを取得します
-								//	editp 	: エディットハンドル
-								//	s		: 選択開始フレーム
-								//	e		: 選択終了フレーム
-								//  戻り値	: TRUEなら成功
-	BOOL		(*set_select_frame)( void *editp,int s,int e );
-								//	選択開始終了フレームを設定します
-								//	editp 	: エディットハンドル
-								//	s		: 選択開始フレーム
-								//	e		: 選択終了フレーム
-								//  戻り値	: TRUEなら成功
-	BOOL		(*rgb2yc)( PIXEL_YC *ycp,PIXEL *pixelp,int w );
-								//	PIXELからPIXEL_YCに変換します
-								//	ycp		: PIXEL_YC構造体へのポインタ
-								//	pixelp 	: PIXEL構造体へのポインタ
-								//	w		: 構造体の数
-								//  戻り値	: TRUEなら成功
-	BOOL		(*yc2rgb)( PIXEL *pixelp,PIXEL_YC *ycp,int w );
-								//	PIXEL_YCからPIXELに変換します
-								//	pixelp 	: PIXEL構造体へのポインタ
-								//	ycp		: PIXEL_YC構造体へのポインタ
-								//	w		: 構造体の数
-								//  戻り値	: TRUEなら成功
-	BOOL		(*dlg_get_load_name)( LPSTR name,LPSTR filter,LPSTR def );
-								//	ファイルダイアログを使って読み込むファイル名を取得します
-								//	name	: ファイル名を格納するポインタ
-								//	filter	: ファイルフィルタ
-								//  def		: デフォルトのファイル名
-								//  戻り値	: TRUEなら成功 FALSEならキャンセル
-	BOOL		(*dlg_get_save_name)( LPSTR name,LPSTR filter,LPSTR def );
-								//	ファイルダイアログを使って書き込むファイル名を取得します
-								//	name	: ファイル名を格納するポインタ
-								//	filter	: ファイルフィルタ
-								//  def		: デフォルトのファイル名
-								//  戻り値	: TRUEなら成功 FALSEならキャンセル
-	int			(*ini_load_int)( void *fp,LPSTR key,int n );
-								//	INIファイルから数値を読み込む
-								//	fp	 	: フィルタ構造体のポインタ
-								//	key		: アクセス用のキーの名前
-								//  n		: デフォルトの数値
-								//  戻り値	: 読み込んだ数値
-	int			(*ini_save_int)( void *fp,LPSTR key,int n );
-								//	INIファイルに数値を書き込む
-								//	fp	 	: フィルタ構造体のポインタ
-								//	key		: アクセス用のキーの名前
-								//  n		: 書き込む数値
-								//  戻り値	: 書き込んだ数値
-	BOOL		(*ini_load_str)( void *fp,LPSTR key,LPSTR str,LPSTR def );
-								//	INIファイルから文字列を読み込む
-								//	fp	 	: フィルタ構造体のポインタ
-								//	key		: アクセス用のキーの名前
-								//  str		: 文字列を読み込むバッファ
-								//  def		: デフォルトの文字列
-								//  戻り値	: TRUEなら成功
-	BOOL		(*ini_save_str)( void *fp,LPSTR key,LPSTR str );
-								//	INIファイルに文字列を書き込む
-								//	fp	 	: フィルタ構造体のポインタ
-								//	key		: アクセス用のキーの名前
-								//  n		: 書き込む文字列
-								//  戻り値	: TRUEなら成功
-	BOOL		(*get_source_file_info)( void *editp,FILE_INFO *fip,int source_file_id );
-								//	指定したファイルIDのファイルの情報を取得します
-								//	editp 	: エディットハンドル
-								//  fip		: ファイルインフォメーション構造体へのポインタ
-								//	souce_file_id
-								//			: ファイルID
-								//  戻り値	: TRUEなら成功
-	BOOL		(*get_source_video_number)( void *editp,int n,int *source_file_id,int *source_video_number );
-								//	指定したフレームのソースのファイルIDとフレーム番号を取得します
-								//	editp 	: エディットハンドル
-								//	n		: フレーム番号
-								//	souce_file_id
-								//			: ファイルIDを格納するポインタ
-								//	souce_video_number
-								//			: フレーム番号を格納するポインタ
-								//  戻り値	: TRUEなら成功
-	BOOL		(*get_sys_info)( void *editp,SYS_INFO *sip );
-								//	システムの情報を取得します
-								//	editp 	: エディットハンドル (NULLならsipの編集中のフラグとすべてのファイル名が無効になります)
-								//  sip		: システムインフォメーション構造体へのポインタ
-								//  戻り値	: TRUEなら成功
-	void 		*(*get_filterp)( int filter_id );
-								//	指定のフィルタIDのフィルタ構造体へのポインタを取得します
-								//	filter_id
-								//		 	: フィルタID (0～登録されてるフィルタの数-1までの値)
-								//  戻り値	: フィルタ構造体へのポインタ (NULLなら失敗)
-	void		*(*get_ycp_filtering)( void *fp,void *editp,int n,void *reserve );
-								//	※出来るだけget_ycp_filtering_cache_ex()の方を使用するようにしてください
-								//	指定したフレームの画像データのポインタを取得します
-								//	データは自分のフィルタの直前までフィルタしたものです
-								//	fp	 	: フィルタ構造体のポインタ
-								//	editp 	: エディットハンドル
-								//	n	 	: フレーム番号
-								//	reserve	: NULLを指定してください
-								//  戻り値	: 画像データへのポインタ (NULLなら失敗)
-								//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
-	int			(*get_audio_filtering)( void *fp,void *editp,int n,void *buf );
-								//	指定したフレームのオーディオデータを読み込みます
-								//	データは自分のフィルタの直前までフィルタしたものです
-								//	fp	 	: フィルタ構造体のポインタ
-								//	editp 	: エディットハンドル
-								//	n		: フレーム番号
-								//	buf 	: 格納するバッファ (NULLならサンプル数の取得のみ)
-								//  戻り値	: 読み込んだサンプル数
-	BOOL		(*set_ycp_filtering_cache_size)( void *fp,int w,int h,int d,int flag );
-								//	get_ycp_filtering_cache_ex()のキャッシュの設定をします
-								//	設定値が変わった時のみキャッシュ領域を再確保します
-								//	キャッシュ領域はフィルタがアクティブの時のみ確保されます
-								//	fp	 	: フィルタ構造体のポインタ
-								//	w	 	: キャッシュ領域の幅
-								//	h	 	: キャッシュ領域の高さ
-								//	d	 	: キャッシュするフレーム数
-								//	flag 	: NULLを指定してください
-								//  戻り値	: TRUEなら成功
-	void		*(*get_ycp_filtering_cache)( void *fp,void *editp,int n );
-								//	※出来るだけget_ycp_filtering_cache_ex()の方を使用するようにしてください
-								//	指定したフレームの画像データのキャッシュポインタを取得します
-								//	set_ycp_filtering_cache_size()の設定にしたがってキャッシュされます
-								//	データは自分のフィルタの直前までフィルタしたものです
-								//	fp	 	: フィルタ構造体のポインタ
-								//	editp 	: エディットハンドル
-								//	n	 	: フレーム番号
-								//  戻り値	: 画像データへのキャッシュポインタ (NULLなら失敗)
-								//			  画像データポインタの内容はキャッシュから破棄されるまで有効
-	void		*(*get_ycp_source_cache)( void *editp,int n,int ofs );
-								//	指定したフレームの画像データのポインタを取得します
-								//	データはフィルタ前のものです
-								//	editp 	: エディットハンドル
-								//	n	 	: フレーム番号
-								//	ofs	 	: 元のAVI上でのフレームのオフセット
-								//  戻り値	: 画像データへのポインタ (NULLなら失敗)
-								//			  画像データポインタの内容はキャッシュから破棄されるまで有効
-	void		*(*get_disp_pixelp)( void *editp,DWORD format );
-								//	表示されているフレームの画像データのポインタを取得します
-								//	データはフィルタ後のものです
-								//	表示フィルタのみ使用可能です。
-								//	editp 	: エディットハンドル
-								//	format	: 画像フォーマット( NULL = RGB24bit / 'Y''U''Y''2' = YUY2 )
-								//  戻り値	: 画像データへのポインタ (NULLなら失敗)
-								//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
-	BOOL		(*get_pixel_source)( void *editp,int n,void *pixelp,DWORD format );
-								//	指定したフレームの画像データを読み込みます
-								//	データはフィルタ前のものです
-								//	editp 	: エディットハンドル
-								//	n	 	: フレーム番号
-								//  pixelp	: DIB形式データを格納するポインタ
-								//	format	: 画像フォーマット( NULL = RGB24bit / 'Y''U''Y''2' = YUY2 )
-								//  戻り値	: TRUEなら成功
-	BOOL		(*get_pixel_filtered_ex)( void *editp,int n,void *pixelp,int *w,int *h,DWORD format );
-								//	指定したフレームの画像データを読み込みます
-								//	データはフィルタ後のものです
-								//	editp 	: エディットハンドル
-								//	n	 	: フレーム番号
-								//  pixelp	: DIB形式データを格納するポインタ (NULLなら画像サイズだけを返します)
-								//	w,h		: 画像のサイズ (NULLならDIB形式データだけを返します)
-								//	format	: 画像フォーマット( NULL = RGB24bit / 'Y''U''Y''2' = YUY2 )
-								//  戻り値	: TRUEなら成功
-	PIXEL_YC	*(*get_ycp_filtering_cache_ex)( void *fp,void *editp,int n,int *w,int *h );
-								//	指定したフレームの画像データのキャッシュポインタを取得します
-								//	set_ycp_filtering_cache_size()の設定にしたがってキャッシュされます
-								//	データは自分のフィルタの直前までフィルタしたものです
-								//	fp	 	: フィルタ構造体のポインタ
-								//	editp 	: エディットハンドル
-								//	n	 	: フレーム番号
-								//	w,h		: 取得した画像のサイズ (NULLなら無視されます)
-								//  戻り値	: 画像データへのキャッシュポインタ (NULLなら失敗)
-								//			  画像データポインタの内容はキャッシュから破棄されるまで有効
-	BOOL		(*exec_multi_thread_func)( MULTI_THREAD_FUNC func,void *param1,void *param2 );
-								//	指定した関数をシステムの設定値に応じたスレッド数で呼び出します
-								//	呼び出された関数内からWin32APIや外部関数(rgb2yc,yc2rgbは除く)を使用しないでください
-								//	func	: マルチスレッドで呼び出す関数
-								//	param1 	: 呼び出す関数に渡す汎用パラメータ
-								//	param2 	: 呼び出す関数に渡す汎用パラメータ
-								//  戻り値	: TRUEなら成功
-	PIXEL_YC	*(*create_yc)( void );
-								//	空のフレーム画像データ領域を作成します
-								//	ycp_editと同様に外部関数で使用できますが
-								//	FILTER_PROC_INFOのycp_edit,ycp_tempと入れ替えることは出来ません
-								//  戻り値	: 作成したフレーム画像データへのポインタ (NULLなら失敗)
-	void		(*delete_yc)( PIXEL_YC *ycp );
-								//	create_ycで作成した領域を削除します
-	BOOL 		(*load_image)( PIXEL_YC *ycp,LPSTR file,int *w,int *h,int flag );
-								//	フレーム画像データにBMPファイルから画像を読み込みます
-								//	ycp     : 画像を読み込むフレーム画像へのポインタ (NULLなら描画をせずにサイズを返します)
-								//	file	: 読み込むBMPファイル名
-								//	w,h		: 読み込んだ画像のサイズ (NULLを指定できます)
-								//	flag 	: NULLを指定してください
-								//  戻り値	: TRUEなら成功
-	void		(*resize_yc)( PIXEL_YC *ycp,int w,int h,PIXEL_YC *ycp_src,int sx,int sy,int sw,int sh );
-								//	フレーム画像データをリサイズします
-								//	元画像の任意の画像領域をリサイズすることも出来ます
-								//	ycp     : リサイズ後のフレーム画像を格納するポインタ
-								//	w,h     : リサイズの解像度
-								//	ycp_src	: 元画像のフレーム画像へのポインタ(NULLならycpと同じ)
-								//	sx,sy	: 元画像のリサイズ対象領域の左上の座標
-								//	sw,sh	: 元画像のリサイズ対象領域のサイズ
-	void 		(*copy_yc)( PIXEL_YC *ycp,int x,int y,PIXEL_YC *ycp_src,int sx,int sy,int sw,int sh,int tr );
-								//	フレーム画像データの任意の領域をコピーします
-								//	描画の際は最大画像サイズの領域に収まるようにクリッピングをします
-								//	コピー元とコピー先の領域は重ならないようにしてください
-								//	ycp     : コピー先のフレーム画像へのポインタ
-								//	x,y		: コピー先の左上の座標
-								//	ycp_src	: コピー元のフレーム画像へのポインタ
-								//	sx,sy	: コピー元の左上の座標
-								//	sw,sh	: コピー元のサイズ
-								//	tr      : コピー元の透明度 (0～4096)
-	void 		(*draw_text)( PIXEL_YC *ycp,int x,int y,LPSTR text,int r,int g,int b,int tr,HFONT hfont,int *w,int *h );
-								//	フレーム画像データにテキストを描画します
-								//	描画の際は最大画像サイズの領域に収まるようにクリッピングをします
-								//	ycp     : 描画するフレーム画像データへのポインタ (NULLなら描画をせずにサイズを返します)
-								//	x,y		: 描画する左上の座標
-								//	text	: 描画するテキストの内容
-								//	r,g,b	: 描画色 (0～255)
-								//	tr      : 透明度 (0～4096)
-								//	hfont	: 描画で使用するフォント (NULLならデフォルトのフォント)
-								//	w,h		: 描画したテキスト領域のサイズ (NULLを指定できます)
-	AVI_FILE_HANDLE (*avi_file_open)( LPSTR file,FILE_INFO *fip,int flag );
-								//	AVIファイルをオープンしてavi_file_read_video(),avi_file_read_audio()で
-								//	データを読み込む為のハンドルを取得します。
-								//	※編集中のファイルとフォーマット(fpsやサンプリングレート等)が異なる場合があるので注意してください。
-								//	file    : 読み込むAVIファイル名 (入力プラグインで読み込めるファイルも指定できます)
-								//  fip		: ファイルインフォメーション構造体へのポインタ (読み込んだファイルの情報が入ります)
-								//	flag 	: 読み込みフラグ
-								//	AVI_FILE_OPEN_FLAG_ONLY_YUY2		: YUY2 で展開するようにします
-								//	AVI_FILE_OPEN_FLAG_ONLY_RGB24		: RGB24で展開するようにします
-								//	AVI_FILE_OPEN_FLAG_ONLY_RGB32		: RGB32で展開するようにします
-								//	AVI_FILE_OPEN_FLAG_VIDEO_ONLY		: ビデオのみ読み込むようにします
-								//	AVI_FILE_OPEN_FLAG_AUDIO_ONLY		: オーディオのみ読み込むようにします
-								//  戻り値	: AVIファイルハンドル (NULLなら失敗)
-	void 		(*avi_file_close)( AVI_FILE_HANDLE afh );
-								//	AVIファイルをクローズします
-								//	afh		: AVIファイルハンドル
-	BOOL 		(*avi_file_read_video)( AVI_FILE_HANDLE afh,PIXEL_YC *ycp,int n );
-								//	フレーム画像データにAVIファイルから画像データを読み込みます
-								//	afh		: AVIファイルハンドル
-								//	ycp     : 画像データを読み込むフレーム画像へのポインタ
-								//	n		: フレーム番号
-								//  戻り値	: TRUEなら成功
-	int 		(*avi_file_read_audio)( AVI_FILE_HANDLE afh,void *buf,int n );
-								//	AVIファイルから音声データを読み込みます
-								//	afh		: AVIファイルハンドル
-								//	buf     : 音声を読み込むバッファへのポインタ
-								//	n		: フレーム番号
-								//  戻り値	: 読み込んだサンプル数
-	void 		*(*avi_file_get_video_pixelp)( AVI_FILE_HANDLE afh,int n );
-								//	AVIファイルから読み込んだDIB形式の画像データのポインタを取得します
-								//	取得できる画像データのフォーマットはavi_file_open()で取得した
-								//	FILE_INFOのビデオ展開形式になります。
-								//	afh		: AVIファイルハンドル
-								//	n		: フレーム番号
-								//  戻り値	: DIB形式データへのポインタ (NULLなら失敗)
-								//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
-	LPSTR		(*get_avi_file_filter)( int type );
-								//	avi_file_open()で読み込めるファイルのファイルフィルタを取得します
-								//	type	: ファイルの種類
-								//	GET_AVI_FILE_FILTER_TYPE_VIDEO	: ビデオル
-								//	GET_AVI_FILE_FILTER_TYPE_AUDIO	: オーディオ
-								//  戻り値	: ファイルフィルタへのポインタ
-	int			(*avi_file_read_audio_sample)( AVI_FILE_HANDLE afh,int start,int length,void *buf );
-								//	AVIファイルから音声データを読み込みます
-								//	afh		: AVIファイルハンドル
-								//	start   : 読み込み開始サンプル番号
-								//	length	: 読み込むサンプル数
-								//	buf		: データを読み込むバッファへのポインタ
-								//  戻り値	: 読み込んだサンプル数
-	int			(*avi_file_set_audio_sample_rate)( AVI_FILE_HANDLE afh,int audio_rate,int audio_ch );
-								//	avi_file_read_audio_sample()で読み込む音声のサンプリングレート等を変更します
-								//	afh		: AVIファイルハンドル
-								//	audio_rate	: 音声サンプリングレート
-								//	audio_ch	: 音声チャンネル数
-								//  戻り値	: 変更したサンプリングレートでの総サンプル数
-	BYTE		*(*get_frame_status_table)( void *editp,int type );
-								//	フレームのステータスが格納されているバッファへのポインタを取得します
-								//	editp 	: エディットハンドル
-								//  type	: ステータスの種類
-								//	FARME_STATUS_TYPE_EDIT_FLAG	: 編集フラグ
-								//	FARME_STATUS_TYPE_INTER		: インターレース
-								//  戻り値	: バッファへのポインタ
-								//			  バッファへのポインタの内容は編集ファイルがクローズされるまで有効
-	BOOL		(*set_undo)( void *editp );
-								//	現在の編集状況をアンドゥバッファに設定します
-								//	editp 	: エディットハンドル
-								//  戻り値	: TRUEなら成功
-	BOOL		(*add_menu_item)( void *fp,LPSTR name,HWND hwnd,int id,int def_key,int flag );
-								//	メインウィンドウの設定メニュー項目を追加します
-								//	メニューが選択された時にhwndで指定したウィンドウに
-								//	WM_FILTER_COMMANDのメッセージを送ります
-								//	※必ずfunc_init()かWM_FILTER_INITから呼び出すようにしてください。
-								//	fp	 	: フィルタ構造体のポインタ
-								//	name 	: メニューの名前
-								//	hwnd 	: WM_FILTER_COMMANDを送るウィンドウハンドル
-								//	id	 	: WM_FILTER_COMMANDのWPARAM
-								//	def_key	: 標準のショートカットキーの仮想キーコード (NULLなら無し)
-								//	flag	: フラグ
-								//	ADD_MENU_ITEM_FLAG_KEY_SHIFT	: 標準のショートカットキーをSHIFT+キーにする
-								//	ADD_MENU_ITEM_FLAG_KEY_CTRL		: 標準のショートカットキーをCTRL+キーにする
-								//	ADD_MENU_ITEM_FLAG_KEY_ALT		: 標準のショートカットキーをALT+キーにする
-								//  戻り値	: TRUEなら成功
-	BOOL 		(*edit_open)( void *editp,LPSTR file,int flag );
-								//	編集ファイルを開きます
-								//	editp 	: エディットハンドル
-								//	file 	: ファイル名
-								//	flag 	: フラグ
-								//	EDIT_OPEN_FLAG_ADD			: 追加読み込みをします
-								//	EDIT_OPEN_FLAG_AUDIO		: 音声読み込みをします
-								//	EDIT_OPEN_FLAG_PROJECT		: プロジェクトファイルを開きます
-								//	EDIT_OPEN_FLAG_DIALOG		: 読み込みダイアログを表示します
-								//  戻り値	: TRUEなら成功
-	BOOL 		(*edit_close)( void *editp );
-								//	編集ファイルを閉じます
-								//	editp 	: エディットハンドル
-								//  戻り値	: TRUEなら成功
-	BOOL 		(*edit_output)( void *editp,LPSTR file,int flag,LPSTR type );
-								//	編集データをAVI出力します
-								//	WAV出力やプラグイン出力も出来ます
-								//	editp 	: エディットハンドル
-								//	file 	: 出力ファイル名
-								//	flag	: フラグ
-								//	EDIT_OUTPUT_FLAG_NO_DIALOG	: 出力ダイアログを表示しません
-								//	EDIT_OUTPUT_FLAG_WAV		: WAV出力をします
-								//	type	: 出力プラグインの名前 (NULLならAVI/WAV出力)
-								//  戻り値	: TRUEなら成功
-	BOOL 		(*set_config)( void *editp,int n,LPSTR name );
-								//	プロファイルを設定します
-								//	editp 	: エディットハンドル
-								//  n		: プロファイル環境の番号
-								//  name	: プロファイルの名前
-								//  戻り値	: TRUEなら成功
+	//	※出来るだけget_ycp_source_cache()の方を使用するようにしてください
+	//	指定したフレームのAVIファイル上でのオフセット分移動した
+	//	フレームの画像データのポインタを取得します
+	//	データはフィルタ前のものです
+	//	editp 	: エディットハンドル
+	//	n	 	: フレーム番号
+	//	ofs	 	: フレームからのオフセット
+	//  戻り値	: 画像データへのポインタ (NULLなら失敗)
+	//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
+	void(*get_ycp_ofs)(void *editp, int n, int ofs);
+	//	※出来るだけget_ycp_source_cache()の方を使用するようにしてください
+	//	指定したフレームの画像データのポインタを取得します
+	//	データはフィルタ前のものです
+	//	editp 	: エディットハンドル
+	//	n	 	: フレーム番号
+	//  戻り値	: 画像データへのポインタ (NULLなら失敗)
+	//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
+	void		*(*get_ycp)(void *editp, int n);
+	//	指定したフレームのDIB形式(RGB24bit)の画像データのポインタを取得します
+	//	データはフィルタ前のものです
+	//	editp 	: エディットハンドル
+	//	n		: フレーム番号
+	//  戻り値	: DIB形式データへのポインタ (NULLなら失敗)
+	//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
+	void		*(*get_pixelp)(void *editp, int n);
+	//	指定したフレームのオーディオデータを読み込みます
+	//	データはフィルタ前のものです
+	//	editp 	: エディットハンドル
+	//	n		: フレーム番号
+	//	buf 	: 格納するバッファ (NULLならサンプル数の取得のみ)
+	//  戻り値	: 読み込んだサンプル数
+	int(*get_audio)(void *editp, int n, void *buf);
+	//	現在編集中か調べます
+	//	editp 	: エディットハンドル
+	//  戻り値	: TRUEなら編集中
+	BOOL(*is_editing)(void *editp);
+	//	現在保存中か調べます
+	//	editp 	: エディットハンドル
+	//  戻り値	: TRUEなら保存中
+	BOOL(*is_saving)(void *editp);
+	//	現在の表示フレームを取得します
+	//	editp 	: エディットハンドル
+	//  戻り値	: 現在のフレーム番号
+	int(*get_frame)(void *editp);
+	//	総フレーム数を取得します
+	//	editp 	: エディットハンドル
+	//  戻り値	: 現在の総フレーム数
+	int(*get_frame_n)(void *editp);
+	//	フィルタ前のフレームのサイズを取得します
+	//	editp 	: エディットハンドル
+	//	w,h 	: 画像サイズの格納ポインタ
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_frame_size)(void *editp, int *w, int *h);
+	//	現在の表示フレームを変更します
+	//	editp 	: エディットハンドル
+	//  n		: フレーム番号
+	//  戻り値	: 設定されたフレーム番号
+	int(*set_frame)(void *editp, int n);
+	//	総フレーム数を変更します
+	//	editp 	: エディットハンドル
+	//  n		: フレーム数
+	//  戻り値	: 設定された総フレーム数
+	int(*set_frame_n)(void *editp, int n);
+	//	フレームを他のフレームにコピーします
+	//	editp 	: エディットハンドル
+	//	d	 	: コピー先フレーム番号
+	//	s	 	: コピー元フレーム番号
+	//  戻り値	: TRUEなら成功
+	BOOL(*copy_frame)(void *editp, int d, int s);
+	//	フレームの映像だけを他のフレームにコピーします
+	//	editp 	: エディットハンドル
+	//	d	 	: コピー先フレーム番号
+	//	s	 	: コピー元フレーム番号
+	//  戻り値	: TRUEなら成功
+	BOOL(*copy_video)(void *editp, int d, int s);
+	//	フレームの音声だけを他のフレームにコピーします
+	//	editp 	: エディットハンドル
+	//	d	 	: コピー先フレーム番号
+	//	s	 	: コピー元フレーム番号
+	//  戻り値	: TRUEなら成功
+	BOOL(*copy_audio)(void *editp, int d, int s);
+	//	クリップボードにDIB形式(RGB24bit)の画像をコピーします
+	//	hwnd 	: ウィンドウハンドル
+	//	pixelp	: DIB形式データへのポインタ
+	//	w,h 	: 画像サイズ
+	//  戻り値	: TRUEなら成功
+	BOOL(*copy_clip)(HWND hwnd, void *pixelp, int w, int h);
+	//	クリップボードから画像を張りつけます
+	//	hwnd 	: ウィンドウハンドル
+	//	editp 	: エディットハンドル
+	//  n		: フレーム番号
+	//  戻り値	: TRUEなら成功
+	BOOL(*paste_clip)(HWND hwnd, void *editp, int n);
+	//	フレームのステータスを取得します
+	//	editp 	: エディットハンドル
+	//  n		: フレーム番号
+	//  fps		: フレームステータスへのポインタ
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_frame_status)(void *editp, int n, FRAME_STATUS *fsp);
+	//	フレームのステータスを変更します
+	//	editp 	: エディットハンドル
+	//  n		: フレーム番号
+	//  fps		: フレームステータスへのポインタ
+	//  戻り値	: TRUEなら成功
+	BOOL(*set_frame_status)(void *editp, int n, FRAME_STATUS *fsp);
+	//	実際に保存されるフレームか調べます
+	//	editp 	: エディットハンドル
+	//  n		: フレーム番号
+	//  戻り値	: TRUEなら保存されます
+	BOOL(*is_saveframe)(void *editp, int n);
+	//	キーフレームかどうか調べます
+	//	editp 	: エディットハンドル
+	//  n		: フレーム番号
+	//  戻り値	: TRUEならキーフレーム
+	BOOL(*is_keyframe)(void *editp, int n);
+	//	再圧縮が必要か調べます
+	//	editp 	: エディットハンドル
+	//  n		: フレーム番号
+	//  戻り値	: TRUEなら再圧縮が必要
+	BOOL(*is_recompress)(void *editp, int n);
+	//	設定ウィンドウのトラックバーとチェックボックスを再描画します
+	//	fp	 	: フィルタ構造体のポインタ
+	//  戻り値	: TRUEなら成功
+	BOOL(*filter_window_update)(void *fp);
+	//	設定ウィンドウが表示されているか調べます
+	//	fp	 	: フィルタ構造体のポインタ
+	//  戻り値	: TRUEなら表示されている
+	BOOL(*is_filter_window_disp)(void *fp);
+	//	編集ファイルの情報を取得します
+	//	editp 	: エディットハンドル
+	//  fip		: ファイルインフォメーション構造体へのポインタ
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_file_info)(void *editp, FILE_INFO *fip);
+	//	現在のプロファイルの名前を取得します
+	//	editp 	: エディットハンドル
+	//  n		: プロファイル環境の番号
+	//  戻り値	: プロファイルの名前へのポインタ (NULLなら失敗)
+	LPSTR(*get_config_name)(void *editp, int n);
+	//	フィルタが有効になっているか調べます
+	//	fp	 	: フィルタ構造体のポインタ
+	//  戻り値	: TRUEならフィルタ有効
+	BOOL(*is_filter_active)(void *fp);
+	//	指定したフレームのDIB形式(RGB24bit)の画像データを読み込みます
+	//	データはフィルタ後のものです
+	//	editp 	: エディットハンドル
+	//	n		: フレーム番号
+	//  pixelp	: DIB形式データを格納するポインタ (NULLなら画像サイズだけを返します)
+	//	w,h		: 画像のサイズ (NULLならDIB形式データだけを返します)
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_pixel_filtered)(void *editp, int n, void *pixelp, int *w, int *h);
+	//	指定したフレームのオーディオデータを読み込みます
+	//	データはフィルタ後のものです
+	//	editp* 	: エディットハンドル
+	//	n		: フレーム番号
+	//	buf 	: 格納するバッファ (NULLならサンプル数の取得のみ)
+	//  戻り値	: 読み込んだサンプル数
+	int(*get_audio_filtered)(void *editp, int n, void *buf);
+	//	選択開始終了フレームを取得します
+	//	editp 	: エディットハンドル
+	//	s		: 選択開始フレーム
+	//	e		: 選択終了フレーム
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_select_frame)(void *editp, int *s, int *e);
+	//	選択開始終了フレームを設定します
+	//	editp 	: エディットハンドル
+	//	s		: 選択開始フレーム
+	//	e		: 選択終了フレーム
+	//  戻り値	: TRUEなら成功
+	BOOL(*set_select_frame)(void *editp, int s, int e);
+	//	PIXELからPIXEL_YCに変換します
+	//	ycp		: PIXEL_YC構造体へのポインタ
+	//	pixelp 	: PIXEL構造体へのポインタ
+	//	w		: 構造体の数
+	//  戻り値	: TRUEなら成功
+	BOOL(*rgb2yc)(PIXEL_YC *ycp, PIXEL *pixelp, int w);
+	//	PIXEL_YCからPIXELに変換します
+	//	pixelp 	: PIXEL構造体へのポインタ
+	//	ycp		: PIXEL_YC構造体へのポインタ
+	//	w		: 構造体の数
+	//  戻り値	: TRUEなら成功
+	BOOL(*yc2rgb)(PIXEL *pixelp, PIXEL_YC *ycp, int w);
+	//	ファイルダイアログを使って読み込むファイル名を取得します
+	//	name	: ファイル名を格納するポインタ
+	//	filter	: ファイルフィルタ
+	//  def		: デフォルトのファイル名
+	//  戻り値	: TRUEなら成功 FALSEならキャンセル
+	BOOL(*dlg_get_load_name)(LPSTR name, LPSTR filter, LPSTR def);
+	//	ファイルダイアログを使って書き込むファイル名を取得します
+	//	name	: ファイル名を格納するポインタ
+	//	filter	: ファイルフィルタ
+	//  def		: デフォルトのファイル名
+	//  戻り値	: TRUEなら成功 FALSEならキャンセル
+	BOOL(*dlg_get_save_name)(LPSTR name, LPSTR filter, LPSTR def);
+	//	INIファイルから数値を読み込む
+	//	fp	 	: フィルタ構造体のポインタ
+	//	key		: アクセス用のキーの名前
+	//  n		: デフォルトの数値
+	//  戻り値	: 読み込んだ数値
+	int(*ini_load_int)(void *fp, LPSTR key, int n);
+	//	INIファイルに数値を書き込む
+	//	fp	 	: フィルタ構造体のポインタ
+	//	key		: アクセス用のキーの名前
+	//  n		: 書き込む数値
+	//  戻り値	: 書き込んだ数値
+	int(*ini_save_int)(void *fp, LPSTR key, int n);
+	//	INIファイルから文字列を読み込む
+	//	fp	 	: フィルタ構造体のポインタ
+	//	key		: アクセス用のキーの名前
+	//  str		: 文字列を読み込むバッファ
+	//  def		: デフォルトの文字列
+	//  戻り値	: TRUEなら成功
+	BOOL(*ini_load_str)(void *fp, LPSTR key, LPSTR str, LPSTR def);
+	//	INIファイルに文字列を書き込む
+	//	fp	 	: フィルタ構造体のポインタ
+	//	key		: アクセス用のキーの名前
+	//  n		: 書き込む文字列
+	//  戻り値	: TRUEなら成功
+	BOOL(*ini_save_str)(void *fp, LPSTR key, LPSTR str);
+	//	指定したファイルIDのファイルの情報を取得します
+	//	editp 	: エディットハンドル
+	//  fip		: ファイルインフォメーション構造体へのポインタ
+	//	souce_file_id
+	//			: ファイルID
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_source_file_info)(void *editp, FILE_INFO *fip, int source_file_id);
+	//	指定したフレームのソースのファイルIDとフレーム番号を取得します
+	//	editp 	: エディットハンドル
+	//	n		: フレーム番号
+	//	souce_file_id
+	//			: ファイルIDを格納するポインタ
+	//	souce_video_number
+	//			: フレーム番号を格納するポインタ
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_source_video_number)(void *editp, int n, int *source_file_id, int *source_video_number);
+	//	システムの情報を取得します
+	//	editp 	: エディットハンドル (NULLならsipの編集中のフラグとすべてのファイル名が無効になります)
+	//  sip		: システムインフォメーション構造体へのポインタ
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_sys_info)(void *editp, SYS_INFO *sip);
+	//	指定のフィルタIDのフィルタ構造体へのポインタを取得します
+	//	filter_id
+	//		 	: フィルタID (0～登録されてるフィルタの数-1までの値)
+	//  戻り値	: フィルタ構造体へのポインタ (NULLなら失敗)
+	void 		*(*get_filterp)(int filter_id);
+	//	※出来るだけget_ycp_filtering_cache_ex()の方を使用するようにしてください
+	//	指定したフレームの画像データのポインタを取得します
+	//	データは自分のフィルタの直前までフィルタしたものです
+	//	fp	 	: フィルタ構造体のポインタ
+	//	editp 	: エディットハンドル
+	//	n	 	: フレーム番号
+	//	reserve	: NULLを指定してください
+	//  戻り値	: 画像データへのポインタ (NULLなら失敗)
+	//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
+	void		*(*get_ycp_filtering)(void *fp, void *editp, int n, void *reserve);
+	//	指定したフレームのオーディオデータを読み込みます
+	//	データは自分のフィルタの直前までフィルタしたものです
+	//	fp	 	: フィルタ構造体のポインタ
+	//	editp 	: エディットハンドル
+	//	n		: フレーム番号
+	//	buf 	: 格納するバッファ (NULLならサンプル数の取得のみ)
+	//  戻り値	: 読み込んだサンプル数
+	int(*get_audio_filtering)(void *fp, void *editp, int n, void *buf);
+	//	get_ycp_filtering_cache_ex()のキャッシュの設定をします
+	//	設定値が変わった時のみキャッシュ領域を再確保します
+	//	キャッシュ領域はフィルタがアクティブの時のみ確保されます
+	//	fp	 	: フィルタ構造体のポインタ
+	//	w	 	: キャッシュ領域の幅
+	//	h	 	: キャッシュ領域の高さ
+	//	d	 	: キャッシュするフレーム数
+	//	flag 	: NULLを指定してください
+	//  戻り値	: TRUEなら成功
+	BOOL(*set_ycp_filtering_cache_size)(void *fp, int w, int h, int d, int flag);
+	//	※出来るだけget_ycp_filtering_cache_ex()の方を使用するようにしてください
+	//	指定したフレームの画像データのキャッシュポインタを取得します
+	//	set_ycp_filtering_cache_size()の設定にしたがってキャッシュされます
+	//	データは自分のフィルタの直前までフィルタしたものです
+	//	fp	 	: フィルタ構造体のポインタ
+	//	editp 	: エディットハンドル
+	//	n	 	: フレーム番号
+	//  戻り値	: 画像データへのキャッシュポインタ (NULLなら失敗)
+	//			  画像データポインタの内容はキャッシュから破棄されるまで有効
+	void		*(*get_ycp_filtering_cache)(void *fp, void *editp, int n);
+	//	指定したフレームの画像データのポインタを取得します
+	//	データはフィルタ前のものです
+	//	editp 	: エディットハンドル
+	//	n	 	: フレーム番号
+	//	ofs	 	: 元のAVI上でのフレームのオフセット
+	//  戻り値	: 画像データへのポインタ (NULLなら失敗)
+	//			  画像データポインタの内容はキャッシュから破棄されるまで有効
+	void		*(*get_ycp_source_cache)(void *editp, int n, int ofs);
+	//	表示されているフレームの画像データのポインタを取得します
+	//	データはフィルタ後のものです
+	//	表示フィルタのみ使用可能です。
+	//	editp 	: エディットハンドル
+	//	format	: 画像フォーマット( NULL = RGB24bit / 'Y''U''Y''2' = YUY2 )
+	//  戻り値	: 画像データへのポインタ (NULLなら失敗)
+	//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
+	void		*(*get_disp_pixelp)(void *editp, DWORD format);
+	//	指定したフレームの画像データを読み込みます
+	//	データはフィルタ前のものです
+	//	editp 	: エディットハンドル
+	//	n	 	: フレーム番号
+	//  pixelp	: DIB形式データを格納するポインタ
+	//	format	: 画像フォーマット( NULL = RGB24bit / 'Y''U''Y''2' = YUY2 )
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_pixel_source)(void *editp, int n, void *pixelp, DWORD format);
+	//	指定したフレームの画像データを読み込みます
+	//	データはフィルタ後のものです
+	//	editp 	: エディットハンドル
+	//	n	 	: フレーム番号
+	//  pixelp	: DIB形式データを格納するポインタ (NULLなら画像サイズだけを返します)
+	//	w,h		: 画像のサイズ (NULLならDIB形式データだけを返します)
+	//	format	: 画像フォーマット( NULL = RGB24bit / 'Y''U''Y''2' = YUY2 )
+	//  戻り値	: TRUEなら成功
+	BOOL(*get_pixel_filtered_ex)(void *editp, int n, void *pixelp, int *w, int *h, DWORD format);
+	//	指定したフレームの画像データのキャッシュポインタを取得します
+	//	set_ycp_filtering_cache_size()の設定にしたがってキャッシュされます
+	//	データは自分のフィルタの直前までフィルタしたものです
+	//	fp	 	: フィルタ構造体のポインタ
+	//	editp 	: エディットハンドル
+	//	n	 	: フレーム番号
+	//	w,h		: 取得した画像のサイズ (NULLなら無視されます)
+	//  戻り値	: 画像データへのキャッシュポインタ (NULLなら失敗)
+	//			  画像データポインタの内容はキャッシュから破棄されるまで有効
+	PIXEL_YC	*(*get_ycp_filtering_cache_ex)(void *fp, void *editp, int n, int *w, int *h);
+	//	指定した関数をシステムの設定値に応じたスレッド数で呼び出します
+	//	呼び出された関数内からWin32APIや外部関数(rgb2yc,yc2rgbは除く)を使用しないでください
+	//	func	: マルチスレッドで呼び出す関数
+	//	param1 	: 呼び出す関数に渡す汎用パラメータ
+	//	param2 	: 呼び出す関数に渡す汎用パラメータ
+	//  戻り値	: TRUEなら成功
+	BOOL(*exec_multi_thread_func)(MULTI_THREAD_FUNC func, void *param1, void *param2);
+	//	空のフレーム画像データ領域を作成します
+	//	ycp_editと同様に外部関数で使用できますが
+	//	FILTER_PROC_INFOのycp_edit,ycp_tempと入れ替えることは出来ません
+	//  戻り値	: 作成したフレーム画像データへのポインタ (NULLなら失敗)
+	PIXEL_YC	*(*create_yc)(void);
+	//	create_ycで作成した領域を削除します
+	void(*delete_yc)(PIXEL_YC *ycp);
+	//	フレーム画像データにBMPファイルから画像を読み込みます
+	//	ycp     : 画像を読み込むフレーム画像へのポインタ (NULLなら描画をせずにサイズを返します)
+	//	file	: 読み込むBMPファイル名
+	//	w,h		: 読み込んだ画像のサイズ (NULLを指定できます)
+	//	flag 	: NULLを指定してください
+	//  戻り値	: TRUEなら成功
+	BOOL(*load_image)(PIXEL_YC *ycp, LPSTR file, int *w, int *h, int flag);
+	//	フレーム画像データをリサイズします
+	//	元画像の任意の画像領域をリサイズすることも出来ます
+	//	ycp     : リサイズ後のフレーム画像を格納するポインタ
+	//	w,h     : リサイズの解像度
+	//	ycp_src	: 元画像のフレーム画像へのポインタ(NULLならycpと同じ)
+	//	sx,sy	: 元画像のリサイズ対象領域の左上の座標
+	//	sw,sh	: 元画像のリサイズ対象領域のサイズ
+	void(*resize_yc)(PIXEL_YC *ycp, int w, int h, PIXEL_YC *ycp_src, int sx, int sy, int sw, int sh);
+	//	フレーム画像データの任意の領域をコピーします
+	//	描画の際は最大画像サイズの領域に収まるようにクリッピングをします
+	//	コピー元とコピー先の領域は重ならないようにしてください
+	//	ycp     : コピー先のフレーム画像へのポインタ
+	//	x,y		: コピー先の左上の座標
+	//	ycp_src	: コピー元のフレーム画像へのポインタ
+	//	sx,sy	: コピー元の左上の座標
+	//	sw,sh	: コピー元のサイズ
+	//	tr      : コピー元の透明度 (0～4096)
+	void(*copy_yc)(PIXEL_YC *ycp, int x, int y, PIXEL_YC *ycp_src, int sx, int sy, int sw, int sh, int tr);
+	//	フレーム画像データにテキストを描画します
+	//	描画の際は最大画像サイズの領域に収まるようにクリッピングをします
+	//	ycp     : 描画するフレーム画像データへのポインタ (NULLなら描画をせずにサイズを返します)
+	//	x,y		: 描画する左上の座標
+	//	text	: 描画するテキストの内容
+	//	r,g,b	: 描画色 (0～255)
+	//	tr      : 透明度 (0～4096)
+	//	hfont	: 描画で使用するフォント (NULLならデフォルトのフォント)
+	//	w,h		: 描画したテキスト領域のサイズ (NULLを指定できます)
+	void(*draw_text)(PIXEL_YC *ycp, int x, int y, LPSTR text, int r, int g, int b, int tr, HFONT hfont, int *w, int *h);
+	//	AVIファイルをオープンしてavi_file_read_video(),avi_file_read_audio()で
+	//	データを読み込む為のハンドルを取得します。
+	//	※編集中のファイルとフォーマット(fpsやサンプリングレート等)が異なる場合があるので注意してください。
+	//	file    : 読み込むAVIファイル名 (入力プラグインで読み込めるファイルも指定できます)
+	//  fip		: ファイルインフォメーション構造体へのポインタ (読み込んだファイルの情報が入ります)
+	//	flag 	: 読み込みフラグ
+	//	AVI_FILE_OPEN_FLAG_ONLY_YUY2		: YUY2 で展開するようにします
+	//	AVI_FILE_OPEN_FLAG_ONLY_RGB24		: RGB24で展開するようにします
+	//	AVI_FILE_OPEN_FLAG_ONLY_RGB32		: RGB32で展開するようにします
+	//	AVI_FILE_OPEN_FLAG_VIDEO_ONLY		: ビデオのみ読み込むようにします
+	//	AVI_FILE_OPEN_FLAG_AUDIO_ONLY		: オーディオのみ読み込むようにします
+	//  戻り値	: AVIファイルハンドル (NULLなら失敗)
+	AVI_FILE_HANDLE(*avi_file_open)(LPSTR file, FILE_INFO *fip, int flag);
+	//	AVIファイルをクローズします
+	//	afh		: AVIファイルハンドル
+	void(*avi_file_close)(AVI_FILE_HANDLE afh);
+	//	フレーム画像データにAVIファイルから画像データを読み込みます
+	//	afh		: AVIファイルハンドル
+	//	ycp     : 画像データを読み込むフレーム画像へのポインタ
+	//	n		: フレーム番号
+	//  戻り値	: TRUEなら成功
+	BOOL(*avi_file_read_video)(AVI_FILE_HANDLE afh, PIXEL_YC *ycp, int n);
+	//	AVIファイルから音声データを読み込みます
+	//	afh		: AVIファイルハンドル
+	//	buf     : 音声を読み込むバッファへのポインタ
+	//	n		: フレーム番号
+	//  戻り値	: 読み込んだサンプル数
+	int(*avi_file_read_audio)(AVI_FILE_HANDLE afh, void *buf, int n);
+	//	AVIファイルから読み込んだDIB形式の画像データのポインタを取得します
+	//	取得できる画像データのフォーマットはavi_file_open()で取得した
+	//	FILE_INFOのビデオ展開形式になります。
+	//	afh		: AVIファイルハンドル
+	//	n		: フレーム番号
+	//  戻り値	: DIB形式データへのポインタ (NULLなら失敗)
+	//			  画像データポインタの内容は次に外部関数を使うかメインに処理を戻すまで有効
+	void 		*(*avi_file_get_video_pixelp)(AVI_FILE_HANDLE afh, int n);
+	//	avi_file_open()で読み込めるファイルのファイルフィルタを取得します
+	//	type	: ファイルの種類
+	//	GET_AVI_FILE_FILTER_TYPE_VIDEO	: ビデオル
+	//	GET_AVI_FILE_FILTER_TYPE_AUDIO	: オーディオ
+	//  戻り値	: ファイルフィルタへのポインタ
+	LPSTR(*get_avi_file_filter)(int type);
+	//	AVIファイルから音声データを読み込みます
+	//	afh		: AVIファイルハンドル
+	//	start   : 読み込み開始サンプル番号
+	//	length	: 読み込むサンプル数
+	//	buf		: データを読み込むバッファへのポインタ
+	//  戻り値	: 読み込んだサンプル数
+	int(*avi_file_read_audio_sample)(AVI_FILE_HANDLE afh, int start, int length, void *buf);
+	//	avi_file_read_audio_sample()で読み込む音声のサンプリングレート等を変更します
+	//	afh		: AVIファイルハンドル
+	//	audio_rate	: 音声サンプリングレート
+	//	audio_ch	: 音声チャンネル数
+	//  戻り値	: 変更したサンプリングレートでの総サンプル数
+	int(*avi_file_set_audio_sample_rate)(AVI_FILE_HANDLE afh, int audio_rate, int audio_ch);
+	//	フレームのステータスが格納されているバッファへのポインタを取得します
+	//	editp 	: エディットハンドル
+	//  type	: ステータスの種類
+	//	FARME_STATUS_TYPE_EDIT_FLAG	: 編集フラグ
+	//	FARME_STATUS_TYPE_INTER		: インターレース
+	//  戻り値	: バッファへのポインタ
+	//			  バッファへのポインタの内容は編集ファイルがクローズされるまで有効
+	BYTE		*(*get_frame_status_table)(void *editp, int type);
+	//	現在の編集状況をアンドゥバッファに設定します
+	//	editp 	: エディットハンドル
+	//  戻り値	: TRUEなら成功
+	BOOL(*set_undo)(void *editp);
+	//	メインウィンドウの設定メニュー項目を追加します
+	//	メニューが選択された時にhwndで指定したウィンドウに
+	//	WM_FILTER_COMMANDのメッセージを送ります
+	//	※必ずfunc_init()かWM_FILTER_INITから呼び出すようにしてください。
+	//	fp	 	: フィルタ構造体のポインタ
+	//	name 	: メニューの名前
+	//	hwnd 	: WM_FILTER_COMMANDを送るウィンドウハンドル
+	//	id	 	: WM_FILTER_COMMANDのWPARAM
+	//	def_key	: 標準のショートカットキーの仮想キーコード (NULLなら無し)
+	//	flag	: フラグ
+	//	ADD_MENU_ITEM_FLAG_KEY_SHIFT	: 標準のショートカットキーをSHIFT+キーにする
+	//	ADD_MENU_ITEM_FLAG_KEY_CTRL		: 標準のショートカットキーをCTRL+キーにする
+	//	ADD_MENU_ITEM_FLAG_KEY_ALT		: 標準のショートカットキーをALT+キーにする
+	//  戻り値	: TRUEなら成功
+	BOOL(*add_menu_item)(void *fp, LPSTR name, HWND hwnd, int id, int def_key, int flag);
+	//	編集ファイルを開きます
+	//	editp 	: エディットハンドル
+	//	file 	: ファイル名
+	//	flag 	: フラグ
+	//	EDIT_OPEN_FLAG_ADD			: 追加読み込みをします
+	//	EDIT_OPEN_FLAG_AUDIO		: 音声読み込みをします
+	//	EDIT_OPEN_FLAG_PROJECT		: プロジェクトファイルを開きます
+	//	EDIT_OPEN_FLAG_DIALOG		: 読み込みダイアログを表示します
+	//  戻り値	: TRUEなら成功
+	BOOL(*edit_open)(void *editp, LPSTR file, int flag);
+	//	編集ファイルを閉じます
+	//	editp 	: エディットハンドル
+	//  戻り値	: TRUEなら成功
+	BOOL(*edit_close)(void *editp);
+	//	編集データをAVI出力します
+	//	WAV出力やプラグイン出力も出来ます
+	//	editp 	: エディットハンドル
+	//	file 	: 出力ファイル名
+	//	flag	: フラグ
+	//	EDIT_OUTPUT_FLAG_NO_DIALOG	: 出力ダイアログを表示しません
+	//	EDIT_OUTPUT_FLAG_WAV		: WAV出力をします
+	//	type	: 出力プラグインの名前 (NULLならAVI/WAV出力)
+	//  戻り値	: TRUEなら成功
+	BOOL(*edit_output)(void *editp, LPSTR file, int flag, LPSTR type);
+	//	プロファイルを設定します
+	//	editp 	: エディットハンドル
+	//  n		: プロファイル環境の番号
+	//  name	: プロファイルの名前
+	//  戻り値	: TRUEなら成功
+	BOOL(*set_config)(void *editp, int n, LPSTR name);
 	int			reserve[7];
 } EXFUNC;
 #define	AVI_FILE_OPEN_FLAG_VIDEO_ONLY		16

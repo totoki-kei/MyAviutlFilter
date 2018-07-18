@@ -9,6 +9,9 @@
     <ClInclude Include="AudioPosition.h">
       <Filter>AudioPosition</Filter>
     </ClInclude>
+    <ClInclude Include="AudioTest.h">
+      <Filter>AudioTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BosekiAudioFilter.cpp" />
@@ -20,6 +23,9 @@
     <ClCompile Include="AudioPosition.cpp">
       <Filter>AudioPosition</Filter>
     </ClCompile>
+    <ClCompile Include="AudioTest.cpp">
+      <Filter>AudioTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="BosekiAudioFilter.def" />
@@ -30,6 +36,9 @@
     </Filter>
     <Filter Include="AudioPosition">
       <UniqueIdentifier>{b1d5c5ad-32b2-4f33-957c-7195f3e5473b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AudioTest">
+      <UniqueIdentifier>{465c9b58-71f5-467f-80d8-33c657ef10b9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
