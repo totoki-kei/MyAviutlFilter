@@ -776,30 +776,30 @@ typedef struct {
 	int		reserve[2];			//	拡張用に予約されてます。NULLにしてください。
 
 } FILTER;
-#define	FILTER_FLAG_ACTIVE				1
-#define	FILTER_FLAG_ALWAYS_ACTIVE		4
-#define	FILTER_FLAG_CONFIG_POPUP		8
-#define	FILTER_FLAG_CONFIG_CHECK		16
-#define	FILTER_FLAG_CONFIG_RADIO		32
-#define	FILTER_FLAG_EX_DATA				1024
-#define	FILTER_FLAG_PRIORITY_HIGHEST	2048
-#define	FILTER_FLAG_PRIORITY_LOWEST		4096
-#define	FILTER_FLAG_WINDOW_THICKFRAME	8192
-#define	FILTER_FLAG_WINDOW_SIZE			16384
-#define	FILTER_FLAG_DISP_FILTER			32768
-#define	FILTER_FLAG_REDRAW				0x20000
-#define	FILTER_FLAG_EX_INFORMATION		0x40000
-#define	FILTER_FLAG_INFORMATION			0x80000
-#define	FILTER_FLAG_NO_CONFIG			0x100000
-#define	FILTER_FLAG_AUDIO_FILTER		0x200000
-#define	FILTER_FLAG_RADIO_BUTTON		0x400000
-#define	FILTER_FLAG_WINDOW_HSCROLL		0x800000
-#define	FILTER_FLAG_WINDOW_VSCROLL		0x1000000
-#define	FILTER_FLAG_INTERLACE_FILTER	0x4000000
-#define	FILTER_FLAG_NO_INIT_DATA		0x8000000
-#define	FILTER_FLAG_IMPORT				0x10000000
-#define	FILTER_FLAG_EXPORT				0x20000000
-#define	FILTER_FLAG_MAIN_MESSAGE		0x40000000
+#define	FILTER_FLAG_ACTIVE				1			// 
+#define	FILTER_FLAG_ALWAYS_ACTIVE		4			// フィルタを常にアクティブにします
+#define	FILTER_FLAG_CONFIG_POPUP		8			// 設定をポップアップメニューにします
+#define	FILTER_FLAG_CONFIG_CHECK		16			// 設定をチェックボックスメニューにします
+#define	FILTER_FLAG_CONFIG_RADIO		32			// 設定をラジオボタンメニューにします
+#define	FILTER_FLAG_EX_DATA				1024		// 拡張データを保存出来るようにします
+#define	FILTER_FLAG_PRIORITY_HIGHEST	2048		// フィルタのプライオリティを常に最上位にします
+#define	FILTER_FLAG_PRIORITY_LOWEST		4096		// フィルタのプライオリティを常に最下位にします
+#define	FILTER_FLAG_WINDOW_THICKFRAME	8192		// サイズ変更可能なウィンドウを作ります
+#define	FILTER_FLAG_WINDOW_SIZE			16384		// 設定ウィンドウのサイズを指定出来るようにします
+#define	FILTER_FLAG_DISP_FILTER			32768		// 表示フィルタにします
+#define	FILTER_FLAG_REDRAW				0x20000		// 再描画をplugin側で処理するようにします
+#define	FILTER_FLAG_EX_INFORMATION		0x40000		// フィルタの拡張情報を設定できるようにします
+#define	FILTER_FLAG_INFORMATION			0x80000		// FILTER_FLAG_EX_INFORMATION を使うようにして下さい
+#define	FILTER_FLAG_NO_CONFIG			0x100000	// 設定ウィンドウを表示しないようにします
+#define	FILTER_FLAG_AUDIO_FILTER		0x200000	// オーディオフィルタにします
+#define	FILTER_FLAG_RADIO_BUTTON		0x400000	// チェックボックスをラジオボタンにします
+#define	FILTER_FLAG_WINDOW_HSCROLL		0x800000	// 水平スクロールバーを持つウィンドウを作ります
+#define	FILTER_FLAG_WINDOW_VSCROLL		0x1000000	// 垂直スクロールバーを持つウィンドウを作ります
+#define	FILTER_FLAG_INTERLACE_FILTER	0x4000000	// インターレース解除フィルタにします
+#define	FILTER_FLAG_NO_INIT_DATA		0x8000000	// func_proc()の画像の初期データを作成しないようにします
+#define	FILTER_FLAG_IMPORT				0x10000000	// インポートメニューを作ります
+#define	FILTER_FLAG_EXPORT				0x20000000	// エクスポートメニューを作ります
+#define	FILTER_FLAG_MAIN_MESSAGE		0x40000000	// func_WndProc()にWM_FILTER_MAIN_???のメッセージを送るようにします
 #define WM_FILTER_UPDATE				(WM_USER+100)
 #define WM_FILTER_FILE_OPEN				(WM_USER+101)
 #define WM_FILTER_FILE_CLOSE			(WM_USER+102)

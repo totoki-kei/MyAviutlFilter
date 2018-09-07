@@ -9,7 +9,7 @@
 //---------------------------------------------------------------------
 // フィルタ構造体のポインタを渡す関数
 //---------------------------------------------------------------------
-EXTERN_C  __declspec(dllexport) FILTER_DLL** GetFilterTableList(void)
+EXTERN_C FILTER_DLL** cdecl GetFilterTableList(void)
 {
 	//must terminate with nullptr
 	//http://qiita.com/yumetodo/items/4d972da03b3be788fcda

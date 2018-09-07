@@ -25,8 +25,8 @@ namespace AudioPosition {
 			double rl = balance < 0 ? 0.0           : 0.0 + balance;
 			double rr = balance < 0 ? 1.0 + balance : 1.0          ;
 
-			fpip->audiop[2 * i] = static_cast<short>(left * ll + right * lr);
-			fpip->audiop[2 * i + 1] = static_cast<short>(left * rl + right * rr);
+			fpip->audiop[2 * i] =     clamp<short>(left * ll + right * lr);
+			fpip->audiop[2 * i + 1] = clamp<short>(left * rl + right * rr);
 		}
 
 		return TRUE;

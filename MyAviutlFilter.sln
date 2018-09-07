@@ -7,26 +7,26 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyAudioFilter", "MyAudioFil
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BosekiAudioFilter", "BosekiAudioFilter\BosekiSoundFilter.vcxproj", "{4AB4CE30-9788-4283-B73D-4E8957C78095}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FilterDllCheck", "FilterDllCheck\FilterDllCheck.vcxproj", "{16CE7149-3421-4180-8474-0E5628AE943C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AF3992C1-EAF2-4B93-8754-B26A572EEA65}.Debug|x64.ActiveCfg = Debug|Win32
 		{AF3992C1-EAF2-4B93-8754-B26A572EEA65}.Debug|x86.ActiveCfg = Debug|Win32
 		{AF3992C1-EAF2-4B93-8754-B26A572EEA65}.Debug|x86.Build.0 = Debug|Win32
-		{AF3992C1-EAF2-4B93-8754-B26A572EEA65}.Release|x64.ActiveCfg = Release|Win32
 		{AF3992C1-EAF2-4B93-8754-B26A572EEA65}.Release|x86.ActiveCfg = Release|Win32
 		{AF3992C1-EAF2-4B93-8754-B26A572EEA65}.Release|x86.Build.0 = Release|Win32
-		{4AB4CE30-9788-4283-B73D-4E8957C78095}.Debug|x64.ActiveCfg = Debug|Win32
 		{4AB4CE30-9788-4283-B73D-4E8957C78095}.Debug|x86.ActiveCfg = Debug|Win32
 		{4AB4CE30-9788-4283-B73D-4E8957C78095}.Debug|x86.Build.0 = Debug|Win32
-		{4AB4CE30-9788-4283-B73D-4E8957C78095}.Release|x64.ActiveCfg = Release|Win32
 		{4AB4CE30-9788-4283-B73D-4E8957C78095}.Release|x86.ActiveCfg = Release|Win32
 		{4AB4CE30-9788-4283-B73D-4E8957C78095}.Release|x86.Build.0 = Release|Win32
+		{16CE7149-3421-4180-8474-0E5628AE943C}.Debug|x86.ActiveCfg = Debug|Win32
+		{16CE7149-3421-4180-8474-0E5628AE943C}.Debug|x86.Build.0 = Debug|Win32
+		{16CE7149-3421-4180-8474-0E5628AE943C}.Release|x86.ActiveCfg = Release|Win32
+		{16CE7149-3421-4180-8474-0E5628AE943C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

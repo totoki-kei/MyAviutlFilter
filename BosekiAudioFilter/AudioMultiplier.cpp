@@ -20,12 +20,12 @@ namespace AudioMultiplier {
 				// left
 				auto& left = fpip->audiop[2 * i];
 				{
-					left = (short)(left * (double)fp->track[0] / (double)(fp->track[1]));
+					left = clamp<short>(left * (double)fp->track[0] / (double)(fp->track[1]));
 				}
 				// right
 				auto& right = fpip->audiop[2 * i + 1];
 				{
-					right = (short)(right * (double)fp->track[2] / (double)(fp->track[3]));
+					right = clamp<short>(right * (double)fp->track[2] / (double)(fp->track[3]));
 				}
 			}
 			else {
