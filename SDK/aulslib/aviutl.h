@@ -13,7 +13,8 @@
 
 #ifndef AVIUTL_PLUGIN_SDK_FILTER_H
 #define AVIUTL_PLUGIN_SDK_FILTER_H
-#include <aviutl_plugin_sdk/filter.h>
+//#include <aviutl_plugin_sdk/filter.h>
+#include <AviUtl/filter.h>
 #endif // #ifndef AVIUTL_PLUGIN_SDK_FILTER_H
 
 namespace auls {\

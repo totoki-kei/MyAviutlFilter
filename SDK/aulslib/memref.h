@@ -14,7 +14,7 @@ struct lua_State;
 
 namespace auls {\
 
-static const LPSTR MEMREF_FILTER_NAME     = "ƒƒ‚ƒŠQÆ";
+static const LPCSTR MEMREF_FILTER_NAME     = "ƒƒ‚ƒŠQÆ";
 static const LPCSTR MEMREF_PLUGIN_FILENAME = "auls_memref.auf";
 
 static const int MEMREF_ERRORCODE_GET_MEMORY_FAILED = -1;
