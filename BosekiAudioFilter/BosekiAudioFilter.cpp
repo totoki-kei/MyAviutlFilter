@@ -7,6 +7,8 @@
 #include "AudioPosition.h"
 #include "AudioWave.h"
 
+#include "AudioTest.h"
+
 //---------------------------------------------------------------------
 // フィルタ構造体のポインタを渡す関数
 //---------------------------------------------------------------------
@@ -18,6 +20,7 @@ EXTERN_C FILTER_DLL** cdecl GetFilterTableList(void)
 		&AudioMultiplier::FilterDeclaration,
 		&AudioPosition::FilterDeclaration,
 		&AudioWave::FilterDeclaration,
+		&AudioTest::FilterDeclaration,
 		nullptr,
 	};
 

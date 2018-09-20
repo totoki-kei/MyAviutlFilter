@@ -2,7 +2,7 @@
 
 #include <AviUtl/filter.h>
 
-namespace AudioPosition {
+namespace AudioTest {
 	extern FILTER_DLL FilterDeclaration;
 
 }
