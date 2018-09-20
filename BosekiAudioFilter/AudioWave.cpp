@@ -56,10 +56,10 @@ namespace AudioWave {
 				val = (2.0 * t - 1) * fp->track[1];
 			}
 
-
-			// 仮に、チャンネル0を左、チャンネル1を右として処理を記述する
-			fpip->audiop[2 * i] = clamp<short>(fpip->audiop[2 * i] + val);
-			fpip->audiop[2 * i + 1] = clamp<short>(fpip->audiop[2 * i + 1] + val);
+			// 全チャネルに加算
+			for (int ch = 0; ch < fpip->audio_ch; ch++) {
+				fpip->audiop[fpip->audio_ch * i + ch] = clamp<short>(fpip->audiop[fpip->audio_ch * i + ch] + val);
+			}
 
 			time += time_per_sample;
 		}
