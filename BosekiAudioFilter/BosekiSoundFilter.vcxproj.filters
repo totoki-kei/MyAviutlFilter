@@ -15,6 +15,12 @@
     <ClInclude Include="AudioWave.h">
       <Filter>AudioWave</Filter>
     </ClInclude>
+    <ClInclude Include="CacheControl.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemInfo.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BosekiAudioFilter.cpp" />
@@ -32,6 +38,9 @@
     <ClCompile Include="AudioWave.cpp">
       <Filter>AudioWave</Filter>
     </ClCompile>
+    <ClCompile Include="SystemInfo.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="BosekiAudioFilter.def" />
@@ -48,6 +57,9 @@
     </Filter>
     <Filter Include="AudioWave">
       <UniqueIdentifier>{2515398c-7610-4349-8e38-6c254c0e7a8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{18230665-0e20-432c-8498-6a1901858ba5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
