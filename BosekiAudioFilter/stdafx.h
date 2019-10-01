@@ -18,10 +18,3 @@
 // TODO: プログラムに必要な追加ヘッダーをここで参照してください
 #include <AviUtl/filter.h>
 
-template <typename T, typename ValueT>
-T clamp(ValueT val) {
-	if (val < std::numeric_limits<T>::min()) return std::numeric_limits<T>::min();
-	if (std::numeric_limits<T>::max() < val) return std::numeric_limits<T>::max();
-	return static_cast<T>(val);
-}
-

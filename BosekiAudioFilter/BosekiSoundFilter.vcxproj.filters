@@ -21,6 +21,7 @@
     <ClInclude Include="SystemInfo.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="Helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BosekiAudioFilter.cpp" />

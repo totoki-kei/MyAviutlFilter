@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <deque>
 #include <algorithm>
 
 #define NOMINMAX
@@ -10,11 +11,11 @@
 
 #include "SystemInfo.h"
 
-template <typename TKey, typename TValue, size_t Size = 32 * 1024 * 1024>
+template <typename TKey, typename TValue, size_t Size = sizeof(TValue) * 1024>
 class CacheControl
 {
 	struct Entry {
-		size_t position;
+		DWORD position;
 		DWORD last_used;
 	};
 public:
@@ -26,8 +27,11 @@ public:
 		, last_used_counter_(0)
 		, data_ptr_(nullptr)
 	{
-		filemap_ = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, Size, NULL);
+		auto block_size = g_sysinfo.GetAllocationGranularity();
+		auto filemap_size = block_size * ((Size + block_size - 1) / block_size);
+		filemap_ = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, filemap_size, NULL);
 	}
+
 	~CacheControl() {
 		if (current_map_base_) {
 			UnmapViewOfFile(current_map_base_);
@@ -78,7 +82,7 @@ private:
 
 		const size_t block_size = g_sysinfo.GetAllocationGranularity();
 
-		size_t pos = it->second.position;
+		auto pos = it->second.position;
 		it->second.last_used = last_used_counter_++;
 
 		size_t pos_start = (pos / block_size) * block_size;

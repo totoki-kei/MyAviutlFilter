@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "AudioMultiplier.h"
 
+#include "Helper.h"
+
 namespace AudioMultiplier {
 	constexpr double MAX_VALUE = 1000.0;
 

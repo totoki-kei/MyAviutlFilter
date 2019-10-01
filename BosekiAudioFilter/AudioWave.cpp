@@ -1,18 +1,19 @@
 #include "stdafx.h"
 #include "AudioWave.h"
 
+#include "Helper.h"
+
 namespace AudioWave {
 
-	int     track_count = 2;
-	LPCTSTR track_names[] = { _T("ü”g”"), _T("‰¹—Ê") };
-	int     track_default_values[] = { 440, 32767 };
-	int     track_min_values[] = { 1, 0 };
-	int     track_max_values[] = { 44000, 32767 };
+	LPCTSTR track_names[] = { _T("ü”g”"), _T("‰¹—Ê"), _T("”gŒ`ƒ‚[ƒh") };
+	int     track_default_values[] = { 440, 10000, 0 };
+	int     track_min_values[] = { 1, -10000, 0 };
+	int     track_max_values[] = { 44000, 10000, 3 };
+	int     track_count = GetTrackCount(track_names, track_default_values, track_min_values, track_max_values);
 
-	int check_count = 3;
-	LPCTSTR check_names[] = { _T("³Œ·"), _T("‹éŒ`"), _T("ƒmƒR") };
-	int check_default_values[] = { 1, 0, 0};
-
+	LPCTSTR check_names[] = { _T("I’[•â³") };
+	int check_default_values[] = { 1 };
+	int check_count = GetCheckCount(check_names, check_default_values);
 
 	BOOL FilterProc(FILTER *fp, FILTER_PROC_INFO *fpip) {
 
@@ -31,7 +32,7 @@ namespace AudioWave {
 		// Œ»İ‚ÌƒtƒŒ[ƒ€‚ªÅIƒtƒŒ[ƒ€‚ÅAŒ»İ‚Ì1üŠú‚ğˆ—‚µ‚«‚é‚¾‚¯‚ÌŠÔ“I—]—T‚ª–³‚¢ê‡‚Í
 		// ƒ[ƒ‰¹‚É·‚µ‘Ö‚¦‚é
 		double frame_stop = std::numeric_limits<double>::max();
-		if (fpip->frame == fpip->frame_n - 1) {
+		if (fp->check[0] && fpip->frame == fpip->frame_n - 1) {
 			auto frame_end_time = frame_time + 1.0 / file_info.video_rate;
 			frame_stop = frame_end_time - fmod(frame_end_time, (1.0 / fp->track[0]));
 		}
@@ -41,19 +42,22 @@ namespace AudioWave {
 			if (time >= frame_stop) break;
 
 			auto t = fmod(time * fp->track[0], 1);
+			auto volume = (fp->track[1] * 32767.0 / 10000.0);
 
 			double val = 0;
-			if (fp->check[0]) {
-				// ³Œ·”g
-				val = sin(t * 3.141592653589793 * 2) * fp->track[1];
-			}
-			else if (fp->check[1]) {
-				// ‹éŒ`”g
-				val = (t < 0.5 ? 1.0 : -1.0) * fp->track[1];
-			}
-			else if (fp->check[2]) {
-				// ‚Ì‚±‚¬‚è”g
-				val = (2.0 * t - 1) * fp->track[1];
+			switch (fp->track[2]) {
+			case 0: // ³Œ·”g
+				val = sin(t * 3.141592653589793 * 2) * volume;
+				break;
+			case 1: // ‹éŒ`”g
+				val = (t < 0.5 ? 1.0 : -1.0) * volume;
+				break;
+			case 2: // OŠp”g
+				val = (t < 0.25 ? t * 4 : t < 0.75 ? -4 * t + 2 : 4 * t - 4) * volume;
+				break;
+			case 3: // ‚Ì‚±‚¬‚è”g
+				val = (2.0 * t - 1) * volume;
+				break;
 			}
 
 			// ‘Sƒ`ƒƒƒlƒ‹‚É‰ÁZ

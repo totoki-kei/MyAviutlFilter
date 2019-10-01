@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "AudioPosition.h"
 
+#include "Helper.h"
+
 namespace AudioPosition {
 
 	int     track_count = 1;
