@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "AudioTest.h"
 
-#include <aulslib\exedit.h>
-#include <aulslib\memref.h>
+#include "Helper.h"
+
+#include <sstream>
+
 
 namespace AudioTest {
-	using namespace auls;
 
 	int     track_count = 1;
 	LPCTSTR track_names[] = { _T("トラック1") };
@@ -14,13 +15,6 @@ namespace AudioTest {
 	int     track_max_values[] = { 36000 };
 
 
-	DWORD GetEffectIndexInExEditObject(FILTER_PROC_INFO* fpip) {
-		return *((DWORD*)fpip - 12);
-	}
-
-	EXEDIT_OBJECT* GetExEditObject(FILTER_PROC_INFO* fpip) {
-		return *((EXEDIT_OBJECT**)fpip - 13);
-	}
 
 	BOOL FilterProc(FILTER *fp, FILTER_PROC_INFO *fpip) {
 		// TODO: 拡張編集呼び出しかそうで無いかを区別するコードを追加する
@@ -36,11 +30,28 @@ namespace AudioTest {
 		//	OutputDebugStringA("\n");
 		//}
 
-		char str[256] = {};
+
 		auto effect_index = GetEffectIndexInExEditObject(fpip);
 		auto obj = GetExEditObject(fpip);
-		sprintf_s(str, "layer=%d,obj=%p,effect=%d\n", obj->layer_disp, obj, effect_index);
-		OutputDebugStringA(str);
+
+		std::stringstream ss;
+
+		ss << __FUNCTION__;
+		ss << "  " << "scene: " << obj->scene_set; // シーン番号
+		ss << ", " << "layer: " << obj->layer_disp; // レイヤー番号
+		ss << ", " << "addr(obj): " << obj; // 拡張編集オブジェクトのアドレス
+		ss << ", " << "filter_index: " << effect_index << "/" << obj->GetFilterNum(); // オブジェクト中のフィルタ番号(0の場合本体)と合計フィルタ数
+		ss << std::endl;
+
+		OutputDebugStringA(ss.str().c_str());
+
+		if (effect_index == 0) {
+			sprintf_s(obj->dispname, "%p(%d, %d)", obj, obj->scene_set, obj->layer_disp);
+		}
+
+		//char str[256] = {};
+		//sprintf_s(str, "layer=%d,obj=%p,effect=%d frame=(%d/%d) filter_num=%d\n", obj->layer_disp, obj, effect_index, fpip->frame, fpip->frame_n, obj->GetFilterNum());
+		//OutputDebugStringA(str);
 
 		
 
@@ -50,6 +61,12 @@ namespace AudioTest {
 	BOOL FilterInit(FILTER *fp) {
 		return TRUE;
 	}
+
+	BOOL FilterUpdate(FILTER* fp, int status) {
+		OutputDebugString((__FUNCTION__ " status: " + std::to_string(status) + "\n").c_str());
+		return TRUE;
+	}
+
 
 	FILTER_DLL FilterDeclaration = {
 		// flag
@@ -69,7 +86,7 @@ namespace AudioTest {
 		// func_exit
 		NULL,
 		// func_update
-		NULL,
+		FilterUpdate,
 		// func_WndProc
 		NULL,
 		// track, check

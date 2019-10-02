@@ -119,8 +119,8 @@ private:
 		if (new_pos + sizeof(TValue) > Size) {
 			auto it = std::min_element(offset_map_.begin(), offset_map_.end(),
 				[](const std::pair<const TKey, Entry>& a, const std::pair<const TKey, Entry>& b) {
-				return a.second.last_used < b.second.last_used;
-			}
+					return a.second.last_used < b.second.last_used;
+				}
 			);
 			new_pos = it->second.position;
 			offset_map_.erase(it);

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <aulslib\exedit.h>
+//#include <aulslib\memref.h>
+
 template <typename T, typename ValueT>
 T clamp(ValueT val) {
 	if (val < std::numeric_limits<T>::min()) return std::numeric_limits<T>::min();
@@ -20,3 +23,11 @@ constexpr int GetCheckCount(LPCTSTR(&names)[CheckCount], int(&default_values)[Ch
 }
 
 
+
+inline DWORD GetEffectIndexInExEditObject(FILTER_PROC_INFO* fpip) {
+	return *((DWORD*)fpip - 12);
+}
+
+inline auls::EXEDIT_OBJECT* GetExEditObject(FILTER_PROC_INFO* fpip) {
+	return *((auls::EXEDIT_OBJECT**)fpip - 13);
+}
