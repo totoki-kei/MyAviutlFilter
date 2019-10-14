@@ -66,6 +66,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerOutput>All</AssemblerOutput>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -75,6 +76,9 @@
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)aviutl\plugins\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -86,6 +90,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerOutput>All</AssemblerOutput>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,14 +98,21 @@
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)aviutl\plugins\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AudioMultiplier.h" />
     <ClInclude Include="AudioPosition.h" />
+    <ClInclude Include="AudioReverse.h" />
     <ClInclude Include="AudioTest.h" />
     <ClInclude Include="AudioWave.h" />
     <ClInclude Include="CacheControl.h" />
     <ClInclude Include="Helper.h" />
+    <ClInclude Include="LinkList.h" />
+    <ClInclude Include="MemMap.h" />
+    <ClInclude Include="RefPtr.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemInfo.h" />
     <ClInclude Include="targetver.h" />
@@ -108,10 +120,12 @@
   <ItemGroup>
     <ClCompile Include="AudioMultiplier.cpp" />
     <ClCompile Include="AudioPosition.cpp" />
+    <ClCompile Include="AudioReverse.cpp" />
     <ClCompile Include="AudioWave.cpp" />
     <ClCompile Include="BosekiAudioFilter.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="AudioTest.cpp" />
+    <ClCompile Include="MemMap.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

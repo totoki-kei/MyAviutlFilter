@@ -22,6 +22,18 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Helper.h" />
+    <ClInclude Include="LinkList.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="MemMap.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="RefPtr.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioReverse.h">
+      <Filter>AudioReverse</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BosekiAudioFilter.cpp" />
@@ -42,6 +54,12 @@
     <ClCompile Include="SystemInfo.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="MemMap.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioReverse.cpp">
+      <Filter>AudioReverse</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="BosekiAudioFilter.def" />
@@ -61,6 +79,9 @@
     </Filter>
     <Filter Include="Common">
       <UniqueIdentifier>{18230665-0e20-432c-8498-6a1901858ba5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AudioReverse">
+      <UniqueIdentifier>{3ec3af3b-13f8-4819-b891-e2825dd8baba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

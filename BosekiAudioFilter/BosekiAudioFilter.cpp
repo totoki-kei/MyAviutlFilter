@@ -6,6 +6,7 @@
 #include "AudioMultiplier.h"
 #include "AudioPosition.h"
 #include "AudioWave.h"
+#include "AudioReverse.h"
 
 #include "AudioTest.h"
 
@@ -19,6 +20,7 @@ EXTERN_C FILTER_DLL** cdecl GetFilterTableList(void)
 	static FILTER_DLL* pluginlist[] = {
 		&AudioMultiplier::FilterDeclaration,
 		&AudioPosition::FilterDeclaration,
+		&AudioReverse::FilterDeclaration,
 		&AudioWave::FilterDeclaration,
 		&AudioTest::FilterDeclaration,
 		nullptr,
