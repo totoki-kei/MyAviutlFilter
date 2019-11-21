@@ -25,11 +25,17 @@ constexpr int GetCheckCount(LPCTSTR(&names)[CheckCount], int(&default_values)[Ch
 
 
 inline DWORD GetEffectIndexInExEditObject(FILTER_PROC_INFO* fpip) {
-	//return *((DWORD*)fpip - 12);
+#ifdef FOR_EXEDIT_VER_0_93
 	return *((DWORD*)fpip - 8);
+#else
+	return *((DWORD*)fpip - 12);
+#endif
 }
 
 inline auls::EXEDIT_OBJECT* GetExEditObject(FILTER_PROC_INFO* fpip) {
-	//return *((auls::EXEDIT_OBJECT**)fpip - 13);
+#ifdef FOR_EXEDIT_VER_0_93
 	return *((auls::EXEDIT_OBJECT**)fpip - 5);
+#else
+	return *((auls::EXEDIT_OBJECT**)fpip - 13);
+#endif
 }
