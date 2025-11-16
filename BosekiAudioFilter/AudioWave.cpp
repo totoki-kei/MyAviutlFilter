@@ -3,6 +3,8 @@
 
 #include "Helper.h"
 
+#include <cmath>
+
 namespace AudioWave {
 
 	LPCTSTR track_names[] = { _T("ü”g”"), _T("‰¹—Ê"), _T("”gŒ`ƒ‚[ƒh") };
