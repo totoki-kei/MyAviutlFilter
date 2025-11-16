@@ -1,0 +1,6 @@
+
+
+■ 構成
+
+BosekiAudioFilter2.dll : コアDLL
+　├ BosekiAudioFilter2.AudioWave.auf2 : 波形ジェネレーター

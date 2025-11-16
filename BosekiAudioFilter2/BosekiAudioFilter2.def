@@ -1,0 +1,7 @@
+LIBRARY
+
+EXPORTS
+	GetFilterPluginTable @1
+	InitializePlugin @2
+	UninitializePlugin @3
+	InitializeLogger @4

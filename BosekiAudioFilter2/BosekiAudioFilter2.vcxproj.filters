@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{878ce808-9257-4be8-8430-595cf2612278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AudioWave">
+      <UniqueIdentifier>{194e5699-663b-4ea2-8d9a-38001d75e44c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Logger.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="AudioWave.h">
+      <Filter>AudioWave</Filter>
+    </ClInclude>
+    <ClInclude Include="AviUtl2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BosekiAudioFilter2.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="AudioWave.cpp">
+      <Filter>AudioWave</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BosekiAudioFilter2.def" />
+  </ItemGroup>
+</Project>
