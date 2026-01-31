@@ -16,6 +16,9 @@
 // 
 //	ログ出力機能初期化関数 (任意) ※logger2.h
 //		void InitializeLogger(LOG_HANDLE* logger)
+// 
+//	設定関連機能初期化関数 (任意) ※config2.h
+//		void InitializeConfig(CONFIG_HANDLE* config)
 
 //----------------------------------------------------------------------------------
 
@@ -43,6 +46,22 @@ struct MEDIA_INFO {
 	int audio_track_num;	// Audioトラック数 ※0ならAudio無し
 	double total_time;		// 総時間 ※静止画の場合は0
 	int width, height;		// 解像度
+};
+
+// モジュール情報構造体
+struct MODULE_INFO {
+	int type;
+	static constexpr int TYPE_SCRIPT_FILTER	= 1;	// フィルタスクリプト
+	static constexpr int TYPE_SCRIPT_OBJECT	= 2;	// オブジェクトスクリプト
+	static constexpr int TYPE_SCRIPT_CAMERA	= 3;	// カメラスクリプト
+	static constexpr int TYPE_SCRIPT_TRACK	= 4;	// トラックバースクリプト
+	static constexpr int TYPE_SCRIPT_MODULE	= 5;	// スクリプトモジュール
+	static constexpr int TYPE_PLUGIN_INPUT	= 6;	// 入力プラグイン
+	static constexpr int TYPE_PLUGIN_OUTPUT	= 7;	// 出力プラグイン
+	static constexpr int TYPE_PLUGIN_FILTER	= 8;	// フィルタプラグイン
+	static constexpr int TYPE_PLUGIN_COMMON	= 9;	// 汎用プラグイン
+	LPCWSTR name;
+	LPCWSTR information;
 };
 
 //----------------------------------------------------------------------------------
@@ -262,6 +281,7 @@ struct EDIT_HANDLE {
 	bool (*call_edit_section)(void (*func_proc_edit)(EDIT_SECTION* edit));
 
 	// call_edit_section()に引数paramを渡せるようにした関数です
+	// param			: 任意のユーザーデータのポインタ
 	bool (*call_edit_section_param)(void* param, void (*func_proc_edit)(void* param, EDIT_SECTION* edit));
 
 	// 編集情報を取得します
@@ -269,6 +289,27 @@ struct EDIT_HANDLE {
 	// info			: 編集情報の格納先へのポインタ
 	// info_size	: 編集情報の格納先のサイズ ※EDIT_INFOと異なる場合はサイズ分のみ取得されます
 	void (*get_edit_info)(EDIT_INFO* info, int info_size);
+
+	// ホストアプリケーションを再起動します
+	void (*restart_host_app)();
+
+	// エフェクト名の一覧をコールバック関数(func_proc_enum_effect)で取得します
+	// param					: 任意のユーザーデータのポインタ
+	// func_proc_enum_effect	: エフェクト名の取得処理のコールバック関数
+	void (*enum_effect_name)(void* param, void (*func_proc_enum_effect)(void* param, LPCWSTR name, int type, int flag));
+	// エフェクト種別 ※今後追加される可能性があります
+	static constexpr int EFFECT_TYPE_FILTER		= 1;	// フィルタ効果
+	static constexpr int EFFECT_TYPE_INPUT		= 2;	// メディア入力
+	static constexpr int EFFECT_TYPE_TRANSITION = 3;	// シーンチェンジ
+	// エフェクトフラグ ※今後追加される可能性があります
+	static constexpr int EFFECT_FLAG_VIDEO		= 1;	// 画像をサポート
+	static constexpr int EFFECT_FLAG_AUDIO		= 2;	// 音声をサポート
+	static constexpr int EFFECT_FLAG_FILTER		= 4;	// フィルタオブジェクトをサポート
+
+	// モジュール情報の一覧をコールバック関数(func_proc_enum_module)で取得します
+	// param					: 任意のユーザーデータのポインタ
+	// func_proc_enum_module	: モジュール情報の取得処理のコールバック関数
+	void (*enum_module_info)(void* param, void (*func_proc_enum_module)(void* param, MODULE_INFO* info));
 
 };
 
