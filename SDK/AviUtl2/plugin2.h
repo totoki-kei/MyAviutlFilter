@@ -1,3 +1,4 @@
+#pragma once
 //----------------------------------------------------------------------------------
 //	汎用プラグイン ヘッダーファイル for AviUtl ExEdit2
 //	By ＫＥＮくん
@@ -5,8 +6,14 @@
 
 //	汎用プラグインは下記の関数を外部公開すると呼び出されます
 //
+//	汎用プラグイン構造体のポインタを渡す関数 (任意)
+//		COMMON_PLUGIN_TABLE* GetCommonPluginTable(void)
+//
 //	プラグイン登録関数 (必須)
 //		void RegisterPlugin(HOST_APP_TABLE* host)
+// 
+//	必要とする本体バージョン番号取得関数 (任意)
+//		DWORD RequiredVersion() ※必要な本体のバージョン番号を返却します
 // 
 //	プラグインDLL初期化関数 (任意)
 //		bool InitializePlugin(DWORD version) ※versionは本体のバージョン番号
@@ -28,6 +35,14 @@ struct FILTER_PLUGIN_TABLE;
 struct SCRIPT_MODULE_TABLE;
 struct EDIT_HANDLE;
 struct PROJECT_FILE;
+
+// 汎用プラグイン構造体
+struct COMMON_PLUGIN_TABLE {
+	LPCWSTR name;				// プラグインの名前
+	LPCWSTR information;		// プラグインの情報
+};
+
+//----------------------------------------------------------------------------------
 
 // オブジェクトハンドル
 typedef void* OBJECT_HANDLE;
@@ -92,10 +107,10 @@ struct EDIT_INFO {
 // メニュー選択やプロジェクト編集のコールバック関数内で利用出来ます
 // フレーム番号、レイヤー番号が0からの番号になります ※UI表示と異なります
 struct EDIT_SECTION {
-	// 編集情報
+	// 編集情報 (call_read_section利用不可)
 	EDIT_INFO* info;
 
-	// 指定の位置にオブジェクトエイリアスを作成します
+	// 指定の位置にオブジェクトエイリアスを作成します (call_read_section利用不可)
 	// alias	: オブジェクトエイリアスデータ(UTF-8)へのポインタ
 	//			  オブジェクトエイリアスファイル(.object)と同じフォーマットになります
 	// layer	: 作成するレイヤー番号
@@ -128,7 +143,7 @@ struct EDIT_SECTION {
 	// object	: オブジェクトのハンドル
 	// 戻り値	: オブジェクトエイリアスデータ(UTF-8)へのポインタ (取得出来ない場合はnullptrを返却)
 	// 			  オブジェクトエイリアスファイルと同じフォーマットになります
-	//			  ※次に文字列返却の関数を使うかコールバック処理の終了まで有効
+	//			  ※次に同一スレッドで文字列返却の関数を使うまで有効
 	LPCSTR (*get_object_alias)(OBJECT_HANDLE object);
 
 	// オブジェクトの設定項目の値を文字列で取得します
@@ -139,10 +154,10 @@ struct EDIT_SECTION {
 	// item		: 対象の設定項目の名称 (エイリアスファイルのキーの名称)
 	// 戻り値	: 取得した設定値(UTF8)へのポインタ (取得出来ない場合はnullptrを返却)
 	//			  エイリアスファイルの設定値と同じフォーマットになります
-	//			  ※次に文字列返却の関数を使うかコールバック処理の終了まで有効
+	//			  ※次に同一スレッドで文字列返却の関数を使うまで有効
 	LPCSTR (*get_object_item_value)(OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR item);
 
-	// オブジェクトの設定項目の値を文字列で設定します
+	// オブジェクトの設定項目の値を文字列で設定します (call_read_section利用不可)
 	// object	: オブジェクトのハンドル
 	// effect	: 対象のエフェクト名 (エイリアスファイルのeffect.nameの値)
 	//			  同じエフェクトが複数ある場合は":n"のサフィックスでインデックス指定出来ます (nは0からの番号)
@@ -153,14 +168,14 @@ struct EDIT_SECTION {
 	// 戻り値	: 設定出来た場合はtrue (対象が見つからない場合は失敗します)
 	bool (*set_object_item_value)(OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR item, LPCSTR value);
 
-	// オブジェクトを移動します
+	// オブジェクトを移動します (call_read_section利用不可)
 	// object	: オブジェクトのハンドル
 	// layer	: 移動先のレイヤー番号
 	// frame	: 移動先のフレーム番号
 	// 戻り値	: 移動した場合はtrue (移動先にオブジェクトが存在する場合は失敗します)
 	bool (*move_object)(OBJECT_HANDLE object, int layer, int frame);
 
-	// オブジェクトを削除します
+	// オブジェクトを削除します (call_read_section利用不可)
 	// object	: オブジェクトのハンドル
 	void (*delete_object)(OBJECT_HANDLE object);
 
@@ -168,11 +183,12 @@ struct EDIT_SECTION {
 	// 戻り値	: オブジェクトのハンドル (未選択の場合はnullptrを返却)　
 	OBJECT_HANDLE (*get_focus_object)();
 
-	// オブジェクト設定ウィンドウで選択するオブジェクトを設定します (コールバック処理の終了時に設定されます)
+	// オブジェクト設定ウィンドウで選択するオブジェクトを設定します (call_read_section利用不可)
+	// ※コールバック処理の終了時に設定されます
 	// object	: オブジェクトのハンドル
 	void (*set_focus_object)(OBJECT_HANDLE object);
 
-	// プロジェクトファイルのポインタを取得します
+	// プロジェクトファイルのポインタを取得します (call_read_section利用不可)
 	// EDIT_HANDLE	: 編集ハンドル
 	// 戻り値		: プロジェクトファイル構造体へのポインタ
 	//				  ※コールバック処理の終了まで有効
@@ -187,14 +203,15 @@ struct EDIT_SECTION {
 	// 戻り値	: 選択中オブジェクトの数
 	int (*get_selected_object_num)();
 
-	// マウス座標のレイヤー・フレーム位置を取得します
+	// マウス座標のレイヤー・フレーム位置を取得します (call_read_section利用不可)
 	// 最後のマウス移動のウィンドウメッセージの座標から計算します
+	// ファイルD&D時のコールバック関数内で取得した場合はドロップ位置になります
 	// layer	: レイヤー番号の格納先
 	// frame	: フレーム番号の格納先
 	// 戻り値	: マウス座標がレイヤー編集上の場合はtrue
 	bool (*get_mouse_layer_frame)(int* layer, int* frame);
 
-	// 指定のスクリーン座標のレイヤー・フレーム位置を取得します
+	// 指定のスクリーン座標のレイヤー・フレーム位置を取得します (call_read_section利用不可)
 	// x,y		: 対象のスクリーン座標
 	// layer	: レイヤー番号の格納先
 	// frame	: フレーム番号の格納先
@@ -215,7 +232,7 @@ struct EDIT_SECTION {
 	// 戻り値		: 取得出来た場合はtrue
 	bool (*get_media_info)(LPCWSTR file, MEDIA_INFO* info, int info_size);
 
-	// 指定の位置にメディアファイルからオブジェクトを作成します
+	// 指定の位置にメディアファイルからオブジェクトを作成します (call_read_section利用不可)
 	// file		: メディアファイルのパス
 	// layer	: 作成するレイヤー番号
 	// frame	: 作成するフレーム番号
@@ -225,7 +242,7 @@ struct EDIT_SECTION {
 	//			  既に存在するオブジェクトに重なったり、メディアファイルに対応していない場合は失敗します
 	OBJECT_HANDLE (*create_object_from_media_file)(LPCWSTR file, int layer, int frame, int length);
 
-	// 指定の位置にオブジェクトを作成します
+	// 指定の位置にオブジェクトを作成します (call_read_section利用不可)
 	// effect	: エフェクト名 (エイリアスファイルのeffect.nameの値)
 	// layer	: 作成するレイヤー番号
 	// frame	: 作成するフレーム番号
@@ -235,22 +252,25 @@ struct EDIT_SECTION {
 	//			  既に存在するオブジェクトに重なったり、指定エフェクトに対応していない場合は失敗します
 	OBJECT_HANDLE (*create_object)(LPCWSTR effect, int layer, int frame, int length);
 
-	// 現在のレイヤー・フレーム位置を設定します ※設定出来る範囲に調整されます
+	// 現在のレイヤー・フレーム位置を設定します (call_read_section利用不可)
+	// ※設定出来る範囲に調整されます
 	// layer	: レイヤー番号
 	// frame	: フレーム番号
 	void (*set_cursor_layer_frame)(int layer, int frame);
 
-	// レイヤー編集のレイヤー・フレームの表示開始位置を設定します ※設定出来る範囲に調整されます
+	// レイヤー編集のレイヤー・フレームの表示開始位置を設定します (call_read_section利用不可)
+	// ※設定出来る範囲に調整されます
 	// layer	: 表示開始レイヤー番号
 	// frame	: 表示開始フレーム番号
 	void (*set_display_layer_frame)(int layer, int frame);
 
-	// フレーム範囲選択を設定します ※設定出来る範囲に調整されます
+	// フレーム範囲選択を設定します (call_read_section利用不可)
+	// ※設定出来る範囲に調整されます
 	// start,end	: 開始終了フレーム番号
 	//				  開始終了フレームの両方に-1を指定すると選択を解除します
 	void (*set_select_range)(int start, int end);
 
-	// グリッド(BPM)を設定します
+	// グリッド(BPM)を設定します (call_read_section利用不可)
 	// tempo	: テンポ
 	// beat		: 拍子
 	// offset	: 基準時間
@@ -262,17 +282,57 @@ struct EDIT_SECTION {
 	//			  ※オブジェクトの編集をするかコールバック処理の終了まで有効
 	LPCWSTR (*get_object_name)(OBJECT_HANDLE object);
 
-	// オブジェクト名を設定します
+	// オブジェクト名を設定します (call_read_section利用不可)
 	// object	: オブジェクトのハンドル
 	// name		: オブジェクト名 (nullptrか空文字を指定すると標準の名前になります)　
 	void (*set_object_name)(OBJECT_HANDLE object, LPCWSTR name);
 
+	// レイヤー名を取得します
+	// layer	: レイヤー番号
+	// 戻り値	: レイヤー名へのポインタ (標準の名前の場合はnullptrを返却)　
+	//			  ※レイヤーの編集をするかコールバック処理の終了まで有効
+	LPCWSTR (*get_layer_name)(int layer);
+
+	// レイヤー名を設定します (call_read_section利用不可)
+	// layer	: レイヤー番号
+	// name		: レイヤー名 (nullptrか空文字を指定すると標準の名前になります)　
+	void (*set_layer_name)(int layer, LPCWSTR name);
+
+	// シーン名を取得します
+	// 戻り値	: シーン名へのポインタ
+	//			  ※シーンの編集をするかコールバック処理の終了まで有効
+	LPCWSTR (*get_scene_name)();
+
+	// シーン名を設定します (call_read_section利用不可)
+	// ※シーンの操作は現状Undoに非対応です
+	// name		: シーン名
+	//			  ※シーン名は必須になります (nullptrや空文字の場合は変更しません)
+	void (*set_scene_name)(LPCWSTR name);
+
+	// シーンの解像度を設定します  (call_read_section利用不可)
+	// ※シーンの操作は現状Undoに非対応です
+	// width	: 横のサイズ
+	// height	: 縦のサイズ
+	void (*set_scene_size)(int width, int height);
+
+	// シーンのフレームレートを設定します (call_read_section利用不可)
+	// ※シーンの操作は現状Undoに非対応です
+	// rate		: フレームレート
+	// scale	: フレームレートのスケール
+	void (*set_scene_frame_rate)(int rate, int scale);
+
+	// シーンのサンプリングレートを設定します (call_read_section利用不可)
+	// ※シーンの操作は現状Undoに非対応です
+	// sample_rate	: サンプリングレート
+	void (*set_scene_sample_rate)(int sample_rate);
+
 };
 
 // 編集ハンドル構造体
+// get_host_app_window()以外はRegisterPlugin処理内から利用出来ません
 struct EDIT_HANDLE {
 	// プロジェクトデータの編集をする為のコールバック関数(func_proc_edit)を呼び出します
-	// 編集情報を排他制御する為にコールバック関数内で編集処理をする形になります
+	// 編集情報を排他制御する為に更新ロック状態のコールバック関数内で編集処理をする形になります
 	// コールバック関数内で編集したオブジェクトは纏めてUndoに登録されます
 	// コールバック関数はメインスレッドから呼ばれます
 	// func_proc_edit	: 編集処理のコールバック関数
@@ -285,7 +345,7 @@ struct EDIT_HANDLE {
 	bool (*call_edit_section_param)(void* param, void (*func_proc_edit)(void* param, EDIT_SECTION* edit));
 
 	// 編集情報を取得します
-	// 既に編集処理中(EDIT_SECTIONが引数のコールバック関数内等)の場合は利用出来ません ※デッドロックします
+	// 編集情報を排他制御する為に参照ロックします。※同一スレッドで既にロック状態の場合はそのまま取得します。
 	// info			: 編集情報の格納先へのポインタ
 	// info_size	: 編集情報の格納先のサイズ ※EDIT_INFOと異なる場合はサイズ分のみ取得されます
 	void (*get_edit_info)(EDIT_INFO* info, int info_size);
@@ -310,6 +370,28 @@ struct EDIT_HANDLE {
 	// param					: 任意のユーザーデータのポインタ
 	// func_proc_enum_module	: モジュール情報の取得処理のコールバック関数
 	void (*enum_module_info)(void* param, void (*func_proc_enum_module)(void* param, MODULE_INFO* info));
+
+	// ホストアプリケーションのメインウィンドウのハンドルを取得します
+	HWND (*get_host_app_window)();
+
+	// 編集状態を取得します
+	int (*get_edit_state)();
+	static constexpr int EDIT_STATE_EDIT = 0;	// 編集中
+	static constexpr int EDIT_STATE_PLAY = 1;	// プレビュー再生中
+	static constexpr int EDIT_STATE_SAVE = 2;	// ファイル出力中
+
+	// プロジェクトデータを参照する為のコールバック関数(func_proc_read_section)を呼び出します
+	// 参照中にデータが更新されないように参照ロック状態のコールバック関数内で処理をする形になります
+	// EDIT_SECTIONの更新系の関数等は利用出来ません ※EDIT_SECTIONの各項目に記載しています
+	// コールバック関数は呼び出し元と同じスレッドで呼ばれます
+	// func_proc_read_section	: コールバック関数
+	// 戻り値					: trueなら成功
+	//							  参照が出来ない場合(出力中等)に失敗します
+	bool (*call_read_section)(void (*func_proc_read_section)(EDIT_SECTION* edit));
+
+	// call_read_section()に引数paramを渡せるようにした関数です
+	// param			: 任意のユーザーデータのポインタ
+	bool (*call_read_section_param)(void* param, void (*func_proc_read_section)(void* param, EDIT_SECTION* edit));
 
 };
 
@@ -360,6 +442,7 @@ struct PROJECT_FILE {
 struct HOST_APP_TABLE {
 	// プラグインの情報を設定する
 	// information	: プラグインの情報
+	// ※現在はGetCommonPluginTable()を利用する方法が推奨になります
 	void (*set_plugin_information)(LPCWSTR information);
 
 	// 入力プラグインを登録する
@@ -378,12 +461,12 @@ struct HOST_APP_TABLE {
 	// script_module_table	: スクリプトモジュール構造体
 	void (*register_script_module)(SCRIPT_MODULE_TABLE* script_module_table);
 
-	// インポートメニューを登録する (ウィンドウメニューのファイルに追加されます)　
+	// インポートメニューを登録する (ウィンドウメニューのファイルに追加されます)
 	// name				: インポートメニューの名称
 	// func_proc_import	: インポートメニュー選択時のコールバック関数
 	void (*register_import_menu)(LPCWSTR name, void (*func_proc_import)(EDIT_SECTION* edit));
 
-	// エクスポートメニューを登録する (ウィンドウメニューのファイルに追加されます)　
+	// エクスポートメニューを登録する (ウィンドウメニューのファイルに追加されます)
 	// name				: エクスポートメニューの名称
 	// func_proc_export	: エクスポートメニュー選択時のコールバック関数
 	void (*register_export_menu)(LPCWSTR name, void (*func_proc_export)(EDIT_SECTION* edit));
@@ -434,5 +517,54 @@ struct HOST_APP_TABLE {
 	// シーンを変更した直後に呼ばれる関数を登録する ※シーンの設定情報が更新された時にも呼ばれます
 	// func_proc_change_scene	: シーン変更時のコールバック関数
 	void (*register_change_scene_handler)(void (*func_proc_change_scene)(EDIT_SECTION* edit));
+
+	// インポートメニューを登録する (ウィンドウメニューのファイルに追加されます)
+	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
+	// name				: インポートメニューの名称
+	// param			: 任意のユーザーデータのポインタ
+	// func_proc_import	: インポートメニュー選択時のコールバック関数
+	void (*register_import_menu_param)(LPCWSTR name, void* param, void (*func_proc_import)(void* param));
+
+	// エクスポートメニューを登録する (ウィンドウメニューのファイルに追加されます)
+	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
+	// name				: エクスポートメニューの名称
+	// param			: 任意のユーザーデータのポインタ
+	// func_proc_export	: エクスポートメニュー選択時のコールバック関数
+	void (*register_export_menu_param)(LPCWSTR name, void* param, void (*func_proc_export)(void* param));
+
+	// レイヤーメニューを登録する (レイヤー編集でオブジェクト未選択時の右クリックメニューに追加されます)
+	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
+	// name					: レイヤーメニューの名称
+	// param				: 任意のユーザーデータのポインタ
+	// func_proc_layer_menu	: レイヤーメニュー選択時のコールバック関数
+	void (*register_layer_menu_param)(LPCWSTR name, void* param, void (*func_proc_layer_menu)(void* param));
+
+	// オブジェクトメニューを登録する (レイヤー編集でオブジェクト選択時の右クリックメニューに追加されます)
+	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
+	// name						: オブジェクトメニューの名称
+	// param					: 任意のユーザーデータのポインタ
+	// func_proc_object_menu	: オブジェクトメニュー選択時のコールバック関数
+	void (*register_object_menu_param)(LPCWSTR name, void* param, void (*func_proc_object_menu)(void* param));
+
+	// 編集メニューを登録する
+	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
+	// name					: 編集メニューの名称 ※名称に'\'を入れると表示を階層に出来ます
+	// param				: 任意のユーザーデータのポインタ
+	// func_proc_edit_menu	: 編集メニュー選択時のコールバック関数
+	void (*register_edit_menu_param)(LPCWSTR name, void* param, void (*func_proc_edit_menu)(void* param));
+
+	// ファイルをD&Dした時に呼ばれる関数を登録する
+	// name					: ドラッグ時のツールチップや入力プラグインの設定で表示する名称
+	// filefilter			: D&Dに対応するファイルフィルタ
+	// func_proc_file_drop	: ファイルをD&Dした時のコールバック関数
+	void (*register_file_drop_handler)(LPCWSTR name, LPCWSTR filefilter, void (*func_proc_file_drop)(EDIT_SECTION* edit, LPCWSTR file));
+
+	// ファイルをD&Dした時に呼ばれる関数を登録する
+	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
+	// name					: ドラッグ時のツールチップや入力プラグインの設定で表示する名称
+	// filefilter			: D&Dに対応するファイルフィルタ
+	// param				: 任意のユーザーデータのポインタ
+	// func_proc_file_drop	: ファイルをD&Dした時のコールバック関数
+	void (*register_file_drop_param_handler)(LPCWSTR name, LPCWSTR filefilter, void* param, void (*func_proc_file_drop)(void* param, LPCWSTR file));
 
 };
