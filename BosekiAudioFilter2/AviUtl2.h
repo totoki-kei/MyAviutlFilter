@@ -12,6 +12,7 @@
 #include <AviUtl2/filter2.h>
 #include <AviUtl2/module2.h>
 #include <AviUtl2/logger2.h>
+#include <AviUtl2/config2.h>
 
 #endif // AVIUTL2_H
 
