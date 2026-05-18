@@ -7,6 +7,7 @@
 // すべてのAviUtl2 SDKヘッダーをインクルードします。
 // (これらヘッダにインクルードガードが無いため、ここでまとめてガードする)
 #include <AviUtl2/plugin2.h>
+#include <AviUtl2/cache2.h>
 #include <AviUtl2/input2.h>
 #include <AviUtl2/output2.h>
 #include <AviUtl2/filter2.h>

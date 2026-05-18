@@ -26,6 +26,9 @@
 // 
 //	設定関連機能初期化関数 (任意) ※config2.h
 //		void InitializeConfig(CONFIG_HANDLE* config)
+//
+//	キャッシュ関連機能初期化関数 ※cache2.h
+//		void InitializeCache(CACHE_HANDLE* cache)
 
 //----------------------------------------------------------------------------------
 
@@ -326,6 +329,35 @@ struct EDIT_SECTION {
 	// sample_rate	: サンプリングレート
 	void (*set_scene_sample_rate)(int sample_rate);
 
+	// レイヤーの表示・非表示状態を取得します
+	// layer	: レイヤー番号
+	// 戻り値	: レイヤーが表示状態の場合はtrue
+	bool (*get_layer_enable)(int layer);
+
+	// レイヤーの表示・非表示状態を設定します (call_read_section利用不可)
+	// layer	: レイヤー番号
+	// enable	: 設定するレイヤーの表示状態
+	void (*set_layer_enable)(int layer, bool enable);
+
+	// レイヤーのロック状態を取得します
+	// layer	: レイヤー番号
+	// 戻り値	: レイヤーがロック状態の場合はtrue
+	bool (*get_layer_lock)(int layer);
+
+	// レイヤーのロック状態を設定します (call_read_section利用不可)
+	// layer	: レイヤー番号
+	// lock		: 設定するレイヤーのロック状態
+	void (*set_layer_lock)(int layer, bool lock);
+
+	// オブジェクトの区間の数を取得します
+	// object	: オブジェクトのハンドル
+	// 戻り値	: 区間の数
+	int (*get_object_section_num)(OBJECT_HANDLE object);
+
+	// 選択中オブジェクトの区間の位置を取得します
+	// 戻り値	: 区間の番号 (未選択の場合は-1を返却)
+	int (*get_focus_object_section)();
+
 };
 
 // 編集ハンドル構造体
@@ -361,10 +393,13 @@ struct EDIT_HANDLE {
 	static constexpr int EFFECT_TYPE_FILTER		= 1;	// フィルタ効果
 	static constexpr int EFFECT_TYPE_INPUT		= 2;	// メディア入力
 	static constexpr int EFFECT_TYPE_TRANSITION = 3;	// シーンチェンジ
+	static constexpr int EFFECT_TYPE_CONTROL	= 4;	// オブジェクト制御
+	static constexpr int EFFECT_TYPE_OUTPUT		= 5;	// メディア出力
 	// エフェクトフラグ ※今後追加される可能性があります
 	static constexpr int EFFECT_FLAG_VIDEO		= 1;	// 画像をサポート
 	static constexpr int EFFECT_FLAG_AUDIO		= 2;	// 音声をサポート
 	static constexpr int EFFECT_FLAG_FILTER		= 4;	// フィルタオブジェクトをサポート
+	static constexpr int EFFECT_FLAG_CAMERA		= 8;	// カメラ効果をサポート
 
 	// モジュール情報の一覧をコールバック関数(func_proc_enum_module)で取得します
 	// param					: 任意のユーザーデータのポインタ
@@ -392,6 +427,30 @@ struct EDIT_HANDLE {
 	// call_read_section()に引数paramを渡せるようにした関数です
 	// param			: 任意のユーザーデータのポインタ
 	bool (*call_read_section_param)(void* param, void (*func_proc_read_section)(void* param, EDIT_SECTION* edit));
+
+	// エフェクトの設定項目の一覧をコールバック関数(func_proc_enum_effect_item)で取得します
+	// effect						: 対象のエフェクト名 (エイリアスファイルのeffect.nameの値)
+	// param						: 任意のユーザーデータのポインタ
+	// func_proc_enum_effect_item	: エフェクトの設定項目の取得処理のコールバック関数
+	// 戻り値						: 取得出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*enum_effect_item)(LPCWSTR effect, void* param, void (*func_proc_enum_effect_item)(void* param, LPCWSTR name, int type));
+	// 設定項目種別 ※今後追加される可能性があります
+	static constexpr int EFFECT_ITEM_TYPE_INTEGER	= 1;	// 整数
+	static constexpr int EFFECT_ITEM_TYPE_NUMBER	= 2;	// 数値
+	static constexpr int EFFECT_ITEM_TYPE_CHECK		= 3;	// チェックボックス
+	static constexpr int EFFECT_ITEM_TYPE_TEXT		= 4;	// テキスト
+	static constexpr int EFFECT_ITEM_TYPE_STRING	= 5;	// 文字列
+	static constexpr int EFFECT_ITEM_TYPE_FILE		= 6;	// ファイル
+	static constexpr int EFFECT_ITEM_TYPE_COLOR		= 7;	// 色
+	static constexpr int EFFECT_ITEM_TYPE_SELECT	= 8;	// リスト選択
+	static constexpr int EFFECT_ITEM_TYPE_SCENE		= 9;	// シーン
+	static constexpr int EFFECT_ITEM_TYPE_RANGE		= 10;	// レイヤー範囲
+	static constexpr int EFFECT_ITEM_TYPE_COMBO		= 11;	// リストと文字の複合
+	static constexpr int EFFECT_ITEM_TYPE_MASK		= 12;	// マスク
+	static constexpr int EFFECT_ITEM_TYPE_FONT		= 13;	// フォント
+	static constexpr int EFFECT_ITEM_TYPE_FIGURE	= 14;	// 図形
+	static constexpr int EFFECT_ITEM_TYPE_DATA		= 15;	// データ
+	static constexpr int EFFECT_ITEM_TYPE_FOLDER	= 16;	// フォルダ
 
 };
 
@@ -490,12 +549,12 @@ struct HOST_APP_TABLE {
 	void (*register_project_save_handler)(void (*func_project_save)(PROJECT_FILE* project));
 
 	// レイヤーメニューを登録する (レイヤー編集でオブジェクト未選択時の右クリックメニューに追加されます)
-	// name					: レイヤーメニューの名称
+	// name					: レイヤーメニューの名称 ※名称に'\'を入れると表示を複数階層に出来ます
 	// func_proc_layer_menu	: レイヤーメニュー選択時のコールバック関数
 	void (*register_layer_menu)(LPCWSTR name, void (*func_proc_layer_menu)(EDIT_SECTION* edit));
 
 	// オブジェクトメニューを登録する (レイヤー編集でオブジェクト選択時の右クリックメニューに追加されます)
-	// name						: オブジェクトメニューの名称
+	// name						: オブジェクトメニューの名称 ※名称に'\'を入れると表示を複数階層に出来ます
 	// func_proc_object_menu	: オブジェクトメニュー選択時のコールバック関数
 	void (*register_object_menu)(LPCWSTR name, void (*func_proc_object_menu)(EDIT_SECTION* edit));
 
@@ -534,14 +593,14 @@ struct HOST_APP_TABLE {
 
 	// レイヤーメニューを登録する (レイヤー編集でオブジェクト未選択時の右クリックメニューに追加されます)
 	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
-	// name					: レイヤーメニューの名称
+	// name					: レイヤーメニューの名称 ※名称に'\'を入れると表示を複数階層に出来ます
 	// param				: 任意のユーザーデータのポインタ
 	// func_proc_layer_menu	: レイヤーメニュー選択時のコールバック関数
 	void (*register_layer_menu_param)(LPCWSTR name, void* param, void (*func_proc_layer_menu)(void* param));
 
 	// オブジェクトメニューを登録する (レイヤー編集でオブジェクト選択時の右クリックメニューに追加されます)
 	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
-	// name						: オブジェクトメニューの名称
+	// name						: オブジェクトメニューの名称 ※名称に'\'を入れると表示を複数階層に出来ます
 	// param					: 任意のユーザーデータのポインタ
 	// func_proc_object_menu	: オブジェクトメニュー選択時のコールバック関数
 	void (*register_object_menu_param)(LPCWSTR name, void* param, void (*func_proc_object_menu)(void* param));
@@ -566,5 +625,26 @@ struct HOST_APP_TABLE {
 	// param				: 任意のユーザーデータのポインタ
 	// func_proc_file_drop	: ファイルをD&Dした時のコールバック関数
 	void (*register_file_drop_param_handler)(LPCWSTR name, LPCWSTR filefilter, void* param, void (*func_proc_file_drop)(void* param, LPCWSTR file));
+
+	// オブジェクト編集の設定項目メニューを登録する (オブジェクト編集の右クリックメニューに追加されます)
+	// name						: 設定項目メニューの名称 ※名称に'\'を入れると表示を複数階層に出来ます
+	// allow_effect_only		: エフェクトのみを許可するか? ※trueの場合はitemがnullptrで呼ばれるケースを許可します
+	// func_proc_item_menu		: 設定項目メニュー選択時のコールバック関数
+	// ※コールバック関数の引数はget_object_item_value()の引数と同じ形式になります
+	void (*register_object_item_menu)(LPCWSTR name, bool allow_effect_only, void (*func_proc_item_menu)(EDIT_SECTION* edit, OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR item));
+
+	// オブジェクト編集の設定項目メニューを登録する (オブジェクト編集の右クリックメニューに追加されます)
+	// 引数paramを渡して編集セクションにしないでコールバックを呼び出します
+	// name						: 設定項目メニューの名称 ※名称に'\'を入れると表示を複数階層に出来ます
+	// allow_effect_only		: エフェクトのみを許可するか? ※trueの場合はitemがnullptrで呼ばれるケースを許可します
+	// param					: 任意のユーザーデータのポインタ
+	// func_proc_item_menu		: 設定項目メニュー選択時のコールバック関数
+	// ※コールバック関数の引数はget_object_item_value()の引数と同じ形式になります
+	void (*register_object_item_menu_param)(LPCWSTR name, bool allow_effect_only, void* param, void (*func_proc_item_menu)(void* param, OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR item));
+
+	// スクリプトモジュールをモジュール名を指定して登録する
+	// script_module_table	: スクリプトモジュール構造体
+	// module_name			: モジュール名
+	void (*register_script_module_name)(SCRIPT_MODULE_TABLE* script_module_table, LPCWSTR module_name);
 
 };
