@@ -38,6 +38,9 @@ struct FILTER_PLUGIN_TABLE;
 struct SCRIPT_MODULE_TABLE;
 struct EDIT_HANDLE;
 struct PROJECT_FILE;
+struct PIXEL_RGBA;
+struct IDWriteFontCollection;
+struct IDWriteFont;
 
 // 汎用プラグイン構造体
 struct COMMON_PLUGIN_TABLE {
@@ -49,6 +52,8 @@ struct COMMON_PLUGIN_TABLE {
 
 // オブジェクトハンドル
 typedef void* OBJECT_HANDLE;
+// エフェクトハンドル
+typedef void* EFFECT_HANDLE;
 
 // レイヤー・フレーム情報構造体
 // フレーム番号、レイヤー番号が0からの番号になります ※UI表示と異なります
@@ -82,6 +87,44 @@ struct MODULE_INFO {
 	LPCWSTR information;
 };
 
+// トラックバー情報構造体
+struct TRACK_INFO {
+	LPCWSTR mode;		// トラックバーの移動モードの名称 ※移動無しの場合はnullptr
+	double* param;		// トラックバーの設定値の配列へのポインタ ※設定値が無い場合はnullptr
+	int param_num;		// トラックバーの設定値の数
+	bool accelerate;	// トラックバーの加速度が有効か？
+	bool decelerate;	// トラックバーの減速度が有効か？
+	bool twopoint;		// トラックバーの中間点無視が有効か？
+	bool timecontrol;	// トラックバーの時間制御が有効か？
+	int group_num;		// 所属グループのトラックバーの数 ※グループ化されていない場合は1
+	int group_index;	// 所属グループ内のインデックス
+	LPCWSTR group_name;	// 所属グループの名称 ※グループ化されていない場合はnullptr
+};
+
+// パレット情報構造体
+struct PALETTE_INFO {
+	static constexpr int PALETTE_NUM = 64;
+	struct {
+		unsigned char r, g, b, a;	// パレット色 ※aは常に255
+	} color[PALETTE_NUM];
+};
+
+// BPM情報構造体
+struct BPM_INFO {
+	float tempo;	// テンポ
+	int	beat;		// 拍子
+	double start;	// 開始位置(秒)
+	float offset;	// 拍子オフセット(秒)
+};
+
+// イベント種別
+enum class EVENT_TYPE : int {
+	UPDATE_OBJECT = 1,			// オブジェクト情報の更新
+	CHANGE_EDIT_FRAME = 2,		// 現在の編集フレームの移動
+	CHANGE_EDIT_SCENE = 3,		// 現在の編集シーンの変更 ※シーン情報の更新も含まれる
+	CHANGE_FOCUS_OBJECT = 4,	// 選択されているオブジェクトの変更
+};
+
 //----------------------------------------------------------------------------------
 
 // 編集情報構造体
@@ -100,9 +143,9 @@ struct EDIT_INFO {
 	int display_layer_num;		// レイヤー編集で表示されているレイヤー数 ※厳密ではないです
 	int select_range_start;		// フレーム範囲選択の開始フレーム番号 ※未選択の場合は-1
 	int select_range_end;		// フレーム範囲選択の終了フレーム番号 ※未選択の場合は-1
-	float grid_bpm_tempo;		// グリッド(BPM)のテンポ
-	int grid_bpm_beat;			// グリッド(BPM)の拍子
-	float grid_bpm_offset;		// グリッド(BPM)の基準時間
+	float grid_bpm_tempo;		// グリッド(BPM)のテンポ ※先頭のBPM情報
+	int grid_bpm_beat;			// グリッド(BPM)の拍子 ※先頭のBPM情報
+	float grid_bpm_offset;		// グリッド(BPM)の拍子オフセット ※先頭のBPM情報
 	int scene_id;		// シーンのID
 };
 
@@ -126,6 +169,7 @@ struct EDIT_SECTION {
 	OBJECT_HANDLE (*create_object_from_alias)(LPCSTR alias, int layer, int frame, int length);
 
 	// 指定のフレーム番号以降にあるオブジェクトを検索します
+	// ※フィルタプラグインから呼び出した場合は処理対象のシーンのオブジェクトを検索します
 	// layer	: 検索対象のレイヤー番号
 	// frame	: 検索を開始するフレーム番号
 	// 戻り値	: 検索したオブジェクトのハンドル (見つからない場合はnullptrを返却)
@@ -146,7 +190,7 @@ struct EDIT_SECTION {
 	// object	: オブジェクトのハンドル
 	// 戻り値	: オブジェクトエイリアスデータ(UTF-8)へのポインタ (取得出来ない場合はnullptrを返却)
 	// 			  オブジェクトエイリアスファイルと同じフォーマットになります
-	//			  ※次に同一スレッドで文字列返却の関数を使うまで有効
+	//			  ※次に同一スレッドで文字列返却の関数を使うかコールバック処理の終了まで有効
 	LPCSTR (*get_object_alias)(OBJECT_HANDLE object);
 
 	// オブジェクトの設定項目の値を文字列で取得します
@@ -157,7 +201,7 @@ struct EDIT_SECTION {
 	// item		: 対象の設定項目の名称 (エイリアスファイルのキーの名称)
 	// 戻り値	: 取得した設定値(UTF8)へのポインタ (取得出来ない場合はnullptrを返却)
 	//			  エイリアスファイルの設定値と同じフォーマットになります
-	//			  ※次に同一スレッドで文字列返却の関数を使うまで有効
+	//			  ※次に同一スレッドで文字列返却の関数を使うかコールバック処理の終了まで有効
 	LPCSTR (*get_object_item_value)(OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR item);
 
 	// オブジェクトの設定項目の値を文字列で設定します (call_read_section利用不可)
@@ -188,7 +232,7 @@ struct EDIT_SECTION {
 
 	// オブジェクト設定ウィンドウで選択するオブジェクトを設定します (call_read_section利用不可)
 	// ※コールバック処理の終了時に設定されます
-	// object	: オブジェクトのハンドル
+	// object	: オブジェクトのハンドル (nullptrを指定すると選択を解除します)
 	void (*set_focus_object)(OBJECT_HANDLE object);
 
 	// プロジェクトファイルのポインタを取得します (call_read_section利用不可)
@@ -358,6 +402,178 @@ struct EDIT_SECTION {
 	// 戻り値	: 区間の番号 (未選択の場合は-1を返却)
 	int (*get_focus_object_section)();
 
+	// オブジェクトの区間の開始フレーム番号を取得します
+	// object	: オブジェクトのハンドル
+	// section	: 区間の番号
+	// 戻り値	: 区間の開始フレーム番号 (取得出来ない場合は-1を返却)
+	int (*get_object_section_frame)(OBJECT_HANDLE object, int section);
+
+	// 指定フレーム位置でのオブジェクトのトラックバー項目の値を取得します
+	// ※フィルタプラグインから呼び出した場合は処理対象のシーンのオブジェクトのみ取得出来ます
+	// object	: オブジェクトのハンドル
+	// effect	: 対象のエフェクト名 (エイリアスファイルのeffect.nameの値)
+	//			  同じエフェクトが複数ある場合は":n"のサフィックスでインデックス指定出来ます (nは0からの番号)
+	// item		: 対象のトラックバー項目の名称 (エイリアスファイルのキーの名称)
+	// frame	: 取得対象のフレーム番号 ※少数部でフレーム間の位置を指定出来ます
+	// value	: トラックバー項目の値の格納先へのポインタ
+	// 戻り値	: 設定出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*get_object_track_value)(OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR item, double frame, double* value);
+
+	// 指定フレーム位置でのオブジェクトのチェックボックス(セクション毎含む)項目の値を取得します
+	// object	: オブジェクトのハンドル
+	// effect	: 対象のエフェクト名 (エイリアスファイルのeffect.nameの値)
+	//			  同じエフェクトが複数ある場合は":n"のサフィックスでインデックス指定出来ます (nは0からの番号)
+	// item		: 対象のチェックボックス項目の名称 (エイリアスファイルのキーの名称)
+	// frame	: 取得対象のフレーム番号 ※セクション毎チェックボックスの場合に利用
+	// value	: チェックボックス項目の値の格納先へのポインタ
+	// 戻り値	: 設定出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*get_object_check_value)(OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR item, int frame, bool* value);
+
+	// オブジェクトのトラックバー項目の情報を取得します
+	// object		: オブジェクトのハンドル
+	// effect		: 対象のエフェクト名 (エイリアスファイルのeffect.nameの値)
+	//				  同じエフェクトが複数ある場合は":n"のサフィックスでインデックス指定出来ます (nは0からの番号)
+	// item			: 対象のトラックバー項目の名称 (エイリアスファイルのキーの名称)
+	// info			: トラックバー情報の格納先へのポインタ
+	// info_size	: トラックバー情報の格納先のサイズ ※TRACK_INFOと異なる場合はサイズ分のみ取得されます
+	// 戻り値		: 取得出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*get_object_track_info)(OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR item, TRACK_INFO* info, int info_size);
+
+	// 現在のパレット名を取得します
+	// ラベル付きの場合は[ラベル名.パレット名]のフォーマットになります
+	// 戻り値		: 現在のパレット名 ※コールバック処理の終了まで有効
+	LPCWSTR (*get_palette_name)();
+
+	// 指定のパレットの情報を取得します
+	// name			: パレット名
+	// info			: パレット情報の格納先へのポインタ
+	// info_size	: パレット情報の格納先のサイズ ※PALETTE_INFOと異なる場合はサイズ分のみ取得されます
+	// 戻り値		: 取得出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*get_palette_info)(LPCWSTR name, PALETTE_INFO* info, int info_size);
+
+	// 登録されているフォントのDirectWriteのフォントのポインタを取得する (IDWriteFontのポインタを取得します) 
+	// font		: フォント名 ※アプリケーション内の登録名
+	// 戻り値	: IDWriteFontのポインタ (指定フォントが無い場合はnullptrを返却)
+	IDWriteFont* (*get_font)(LPCWSTR font);
+
+	// オブジェクトのトラックバーグループの所属アイテム名を取得します
+	// object		: オブジェクトのハンドル
+	// effect		: 対象のエフェクト名 (エイリアスファイルのeffect.nameの値)
+	//				  同じエフェクトが複数ある場合は":n"のサフィックスでインデックス指定出来ます (nは0からの番号)
+	// group_name	: 対象のトラックバーグループ項目の名称 (エイリアスファイルのキーの名称)
+	// item_names	: 所属アイテム名の格納先へのポインタ
+	// item_num		: 所属アイテム名の格納先の数
+	// 戻り値		: 取得出来た所属アイテム名の数 (指定グループが無い場合は0を返却)
+	//				  item_namesがnullptrの場合は所属アイテム数を返却します
+	int (*get_object_track_group_names)(OBJECT_HANDLE object, LPCWSTR effect, LPCWSTR group_name, LPCWSTR* item_names, int item_num);
+
+	// 新しい関数に差し替えるので廃止します
+	int (*deprecated_get_grid_bpm_list)(BPM_INFO* bpm_list, int bpm_num);
+
+	// 新しい関数に差し替えるので廃止します
+	void (*deprecated_set_grid_bpm_list)(BPM_INFO* bpm_list, int bpm_num);
+
+	// オブジェクトからエフェクトを検索します
+	// object	: 検索対象のオブジェクトのハンドル
+	// effect	: 検索するエフェクト名 (エイリアスファイルのeffect.nameの値)
+	//			  同じエフェクトが複数ある場合は":n"のサフィックスでインデックス指定出来ます (nは0からの番号)
+	//			  nullptrを指定すると先頭のエフェクトを取得します
+	// 戻り値	: 検索したエフェクトのハンドル (見つからない場合はnullptrを返却)
+	//			  ※エフェクトハンドルはエフェクトが破棄されるかコールバック処理の終了まで有効
+	EFFECT_HANDLE (*find_effect)(OBJECT_HANDLE object, LPCWSTR effect);
+
+	// オブジェクトからエフェクト一覧を取得します
+	// object		: オブジェクトのハンドル
+	// effect_list	: エフェクトのハンドルリストの格納先へのポインタ
+	// effect_num	: エフェクトのハンドルリストの格納先の数
+	// 戻り値		: 取得出来たエフェクトハンドルの数 (取得出来ない場合は0を返却)　
+	//				  effect_listがnullptrの場合は所有しているエフェクトの数を返却します
+	//				  ※エフェクトハンドルはエフェクトが破棄されるかコールバック処理の終了まで有効
+	int (*get_effect_list)(OBJECT_HANDLE object, EFFECT_HANDLE* effect_list, int effect_num);
+
+	// エフェクト名を取得します
+	// effect	: エフェクトのハンドル
+	// 戻り値	: エフェクト名へのポインタ (取得出来ない場合はnullptrを返却)　
+	LPCWSTR (*get_effect_name)(EFFECT_HANDLE effect);
+
+	// エフェクトの有効・無効状態を取得します
+	// effect	: エフェクトのハンドル
+	// 戻り値	: エフェクトが有効状態の場合はtrue
+	bool (*get_effect_enable)(EFFECT_HANDLE effect);
+
+	// エフェクトの有効・無効状態を設定します (call_read_section利用不可)
+	// effect	: エフェクトのハンドル
+	// enable	: 設定するエフェクトの有効・無効状態
+	//			  ※エフェクトが出力項目(標準描画等)の場合は変更出来ません (常に有効状態)　
+	void (*set_effect_enable)(EFFECT_HANDLE effect, bool enable);
+
+	// エフェクトのロック状態を取得します
+	// effect	: エフェクトのハンドル
+	// 戻り値	: エフェクトがロック状態の場合はtrue
+	bool (*get_effect_lock)(EFFECT_HANDLE effect);
+
+	// エフェクトのロック状態を設定します (call_read_section利用不可)
+	// effect	: エフェクトのハンドル
+	// enable	: 設定するエフェクトのロック状態
+	//			  ※エフェクトが音声の場合は変更出来ません
+	//			  ※エフェクトが出力項目(標準描画等)の場合は変更出来ません (入力項目に同期)
+	void (*set_effect_lock)(EFFECT_HANDLE effect, bool lock);
+
+	// エフェクトの設定項目の値を文字列で取得します
+	// effect	: エフェクトのハンドル
+	// item		: 対象の設定項目の名称 (エイリアスファイルのキーの名称)
+	// 戻り値	: 取得した設定値(UTF8)へのポインタ (取得出来ない場合はnullptrを返却)
+	//			  エイリアスファイルの設定値と同じフォーマットになります
+	//			  ※次に同一スレッドで文字列返却の関数を使うかコールバック処理の終了まで有効
+	LPCSTR (*get_effect_item_value)(EFFECT_HANDLE effect, LPCWSTR item);
+
+	// エフェクトの設定項目の値を文字列で設定します (call_read_section利用不可)
+	// effect	: エフェクトのハンドル
+	// item		: 対象の設定項目の名称 (エイリアスファイルのキーの名称)
+	// value	: 設定値(UTF8)
+	//			  エイリアスファイルの設定値と同じフォーマットになります
+	// 戻り値	: 設定出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*set_effect_item_value)(EFFECT_HANDLE effect, LPCWSTR item, LPCSTR value);
+
+	// 指定フレーム位置でのエフェクトのトラックバー項目の値を取得します
+	// ※フィルタプラグインから呼び出した場合は処理対象のシーンのオブジェクトのみ取得出来ます
+	// effect	: エフェクトのハンドル
+	// item		: 対象のトラックバー項目の名称 (エイリアスファイルのキーの名称)
+	// frame	: 取得対象のフレーム番号 ※少数部でフレーム間の位置を指定出来ます
+	// value	: トラックバー項目の値の格納先へのポインタ
+	// 戻り値	: 設定出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*get_effect_track_value)(EFFECT_HANDLE effect, LPCWSTR item, double frame, double* value);
+
+	// 指定フレーム位置でのエフェクトのチェックボックス(セクション毎含む)項目の値を取得します
+	// effect	: エフェクトのハンドル
+	// item		: 対象のチェックボックス項目の名称 (エイリアスファイルのキーの名称)
+	// frame	: 取得対象のフレーム番号 ※セクション毎チェックボックスの場合に利用
+	// value	: チェックボックス項目の値の格納先へのポインタ
+	// 戻り値	: 設定出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*get_effect_check_value)(EFFECT_HANDLE effect, LPCWSTR item, int frame, bool* value);
+
+	// エフェクトのトラックバー項目の情報を取得します
+	// effect		: エフェクトのハンドル
+	// item			: 対象のトラックバー項目の名称 (エイリアスファイルのキーの名称)
+	// info			: トラックバー情報の格納先へのポインタ
+	// info_size	: トラックバー情報の格納先のサイズ ※TRACK_INFOと異なる場合はサイズ分のみ取得されます
+	// 戻り値		: 取得出来た場合はtrue (対象が見つからない場合は失敗します)
+	bool (*get_effect_track_info)(EFFECT_HANDLE effect, LPCWSTR item, TRACK_INFO* info, int info_size);
+
+	// グリッド(BPM)のBPM情報一覧を取得します
+	// bpm_list		: BPM情報リストの格納先へのポインタ
+	// bpm_num		: BPM情報リストの格納先の数
+	// bpm_size		: BPM情報構造体のサイズ ※BPM_INFOと異なる場合はサイズ分のみ取得されます
+	// 戻り値		: 取得出来たBPM情報の数
+	//				  bpm_listがnullptrの場合はグリッド(BPM)に設定されているBPM情報の数を返却します
+	int (*get_grid_bpm_list)(BPM_INFO* bpm_list, int bpm_num, int bpm_size);
+
+	// グリッド(BPM)のBPM情報一覧を設定します (call_read_section利用不可)
+	// bpm_list		: 設定するBPM情報リストへのポインタ
+	// bpm_num		: 設定するBPM情報リストの要素数
+	// bpm_size		: BPM情報構造体のサイズ ※BPM_INFOと異なる場合はサイズ分のみ設定されます
+	void (*set_grid_bpm_list)(BPM_INFO* bpm_list, int bpm_num, int bpm_size);
+
 };
 
 // 編集ハンドル構造体
@@ -451,6 +667,45 @@ struct EDIT_HANDLE {
 	static constexpr int EFFECT_ITEM_TYPE_FIGURE	= 14;	// 図形
 	static constexpr int EFFECT_ITEM_TYPE_DATA		= 15;	// データ
 	static constexpr int EFFECT_ITEM_TYPE_FOLDER	= 16;	// フォルダ
+
+	// 現在のシーンの映像のレンダリングをします
+	// この関数はレンダリングのタスクを追加するのみで完了します
+	// レンダリング完了時はレンダリング用スレッドからコールバック関数が呼ばれます
+	// frame						: レンダリング対象のフレーム
+	// param						: 任意のユーザーデータのポインタ
+	// func_proc_rendering_video	: レンダリング完了時に呼ばれるコールバック関数
+	//	buffer						: レンダリングした画像データへのポインタ ※PIXEL_RGBA形式
+	//	width,height				: レンダリングした画像サイズ
+	//	pitch						: レンダリングした画像データの横1ラインのバイト数
+	// 戻り値						: レンダリング要求が成功した場合はtrue (出力中等は失敗します)
+	bool (*rendering_scene_video)(int frame, void* param, void (*func_proc_rendering_video)(void* param, int frame, const void* buffer, int width, int height, int pitch));
+
+	// 現在のシーンの音声のレンダリングをします
+	// この関数はレンダリングのタスクを追加するのみで完了します
+	// レンダリング完了時はレンダリング用スレッドからコールバック関数が呼ばれます
+	// frame						: レンダリング対象のフレーム
+	// param						: 任意のユーザーデータのポインタ
+	// func_proc_rendering_audio	: レンダリング完了時に呼ばれるコールバック関数
+	//	buffer0						: レンダリングした音声データ(左チャンネル)へのポインタ ※PCM(float)32bit形式
+	//	buffer1						: レンダリングした音声データ(右チャンネル)へのポインタ ※PCM(float)32bit形式
+	//	sample_num					: レンダリングした音声のサンプル数
+	// 戻り値						: レンダリング要求が成功した場合はtrue (出力中等は失敗します)
+	bool (*rendering_scene_audio)(int frame, void* param, void (*func_proc_rendering_audio)(void* param, int frame, const float* buffer0, const float* buffer1, int sample_num));
+
+	// レンダリング中のタスクが全て完了するまで待機します
+	// ※参照ロック、編集ロック状態で呼び出すとデットロックする可能性があります
+	void (*wait_rendering_task)();
+
+	// フォント名の一覧をコールバック関数(func_proc_enum_font)で取得します
+	// param				: 任意のユーザーデータのポインタ
+	// func_proc_enum_font	: フォント名の取得処理のコールバック関数
+	void (*enum_font_name)(void* param, void (*func_proc_enum_font)(void* param, LPCWSTR name));
+
+	// パレット名の一覧をコールバック関数(func_proc_enum_palette)で取得します
+	// パレット情報を排他制御する為に参照ロックします。※同一スレッドで既にロック状態の場合はそのまま取得します。
+	// param					: 任意のユーザーデータのポインタ
+	// func_proc_enum_palette	: パレット名の取得処理のコールバック関数
+	void (*enum_palette_name)(void* param, void (*func_proc_enum_palette)(void* param, LPCWSTR name));
 
 };
 
@@ -646,5 +901,17 @@ struct HOST_APP_TABLE {
 	// script_module_table	: スクリプトモジュール構造体
 	// module_name			: モジュール名
 	void (*register_script_module_name)(SCRIPT_MODULE_TABLE* script_module_table, LPCWSTR module_name);
+
+	// フォントコレクションを登録する
+	// collection	: フォントコレクション (IDWriteFontCollectionのポインタ)
+	//				  ※DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED)から作成したものが利用出来ると思います
+	void (*register_font_collection)(IDWriteFontCollection* collection);
+
+	// 指定のイベントのコールバック関数を登録する
+	// コールバック関数はイベント用スレッドから呼ばれます
+	// イベント処理からcall_edit_section()は利用出来ません
+	// event			: イベント種別
+	// func_proc_event	: イベント処理のコールバック関数
+	void (*register_event_listener)(EVENT_TYPE type, void* param, void (*func_proc_event)(void* param));
 
 };
